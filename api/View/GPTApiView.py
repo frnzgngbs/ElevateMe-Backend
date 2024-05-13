@@ -36,9 +36,9 @@ class GPTApiView(ViewSet):
                 {"role": "user", "content": prompt}]
         )
 
-        content_list = response.choices[0].message.content.split('\n')
+        problem_statement = response.choices[0].message.content.split('\n')
 
-        return Response({"response": content_list}, status=status.HTTP_200_OK)
+        return Response({"response": problem_statement}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def five_whys(self, request):
@@ -59,15 +59,59 @@ class GPTApiView(ViewSet):
             ]
         )
 
+        five_whys = response.choices[0].message.content.split('\n')
+
+        return Response({"response": five_whys})
+
+    @action(detail=False, methods=['post'])
+    def potential_root(self, request):
+        list_of_whys = request.data.get('list_of_whys')
+
+        joined_whys = ", ".join(list_of_whys)
+
+        prompt = (
+            f"Generate potential root problem to uncover the underlying issue behind "
+            f"{joined_whys}. Make it relevant to the {joined_whys} and understandable.")
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "Disregard if the question is out of the context  and seems like a nonsense to you. Also,"
+                            "in generating responses, you should give it directly without explanation."
+                 },
+                {"role": "user", "content": prompt}
+            ]
+        )
+
         print(response)
 
-        return None
+        root_problem = response.choices[0].message.content.split('\n')
 
+
+        return Response({"response": root_problem})
     def five_hmws(self, request):
-        pass
+        root_problem = request.data.get('root_problem')
 
-    def potential_root(self, request):
-        pass
+        prompt = (
+            f"Generate five How Might We (HMW) given the root potential problem: {root_problem}."
+            f"Make it relevant to the {root_problem} and understandable.")
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "Disregard if the question is out of the context  and seems like a nonsense to you. Also,"
+                            "in generating responses, you should give it directly without explanation."
+                 },
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        five_hmws = response.choices[0].message.content.split('\n')
+
+        return Response({"response": five_hmws})
+
 
     def elevator_pitch(self, request):
         pass
