@@ -1,8 +1,8 @@
 from django.urls import path
+from .View import GPTApiView
 
-from . import views
 
 urlpatterns = [
-    path('ai/', views.GPTApiView.as_view()),
+    path('ai/', GPTApiView.as_view()),
 ]
 
