@@ -1,30 +1,24 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import AllowAny
+from rest_framework.decorators import action
 import openai
 import os
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+openai.api_key = OPENAI_API_KEY
 
 # Create your views here.
-class GPTApiView(APIView):
+class GPTApiView(ViewSet):
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        task = request.data.get('task')
-
-        if task == "problem_statement":
-            return self.problem_statement(request)
-
-
+    @action(dmethods=['post'])
     def problem_statement(self, request):
         field1 = request.data.get('field1')
         field2 = request.data.get('field2')
         field3 = request.data.get('field3')
         field4_filter = request.data.get('filter')
-
-        openai.api_key = OPENAI_API_KEY
 
         if filter is not None:
             prompt = f"Generate 5 problem statement given these 3 fields: {field1}, {field2}s, {field3}."
@@ -48,8 +42,9 @@ class GPTApiView(APIView):
 
         return Response({"response": content_list}, status=status.HTTP_200_OK)
 
+    @action(methods=['post'])
     def five_whys(self, request):
-        pass
+
 
     def five_hmws(self, request):
         pass
