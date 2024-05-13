@@ -6,9 +6,9 @@ from .View import *
 
 router = SimpleRouter()
 router.register('user', UserView)
+router.register('ai', GPTApiView, basename='ai')
 
 urlpatterns = [
-    path('ai/', GPTApiView.as_view()),
     path('', include(router.urls))  # Correct usage of include
 ]
 
