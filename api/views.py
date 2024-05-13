@@ -1,12 +1,21 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 import openai
 
 
 # Create your views here.
 class GPTApiView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
+        task = request.data.get('task')
+
+        if task == "problem_statement":
+            return self.problem_statement(request)
+
+
+    def problem_statement(self, request):
         field1 = request.data.get('field1')
         field2 = request.data.get('field2')
         field3 = request.data.get('field3')
@@ -32,3 +41,15 @@ class GPTApiView(APIView):
         content_list = response.choices[0].message.content.split('\n')
 
         return Response({"response": content_list})
+
+    def five_whys(self, request):
+        pass
+
+    def five_hmws(self, request):
+        pass
+
+    def potential_root(self,request):
+        pass
+
+    def elevator_pitch(self, request):
+        pass
