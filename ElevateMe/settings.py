@@ -83,8 +83,14 @@ WSGI_APPLICATION = 'ElevateMe.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'elevatemedb',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS':{'init_command': 'SET SQL_MODE=STRICT_TRANS_TABLES'},
+
     }
 }
 

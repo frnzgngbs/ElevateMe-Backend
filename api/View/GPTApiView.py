@@ -31,7 +31,7 @@ class GPTApiView(APIView):
         else:
             prompt = f"Generate 5 problem statement given these 3 fields: {field1}, {field2}, {field3}. Apply filter: {field4_filter}"
 
-        try :
+        try:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -41,7 +41,7 @@ class GPTApiView(APIView):
                     {"role": "user", "content": prompt}]
             )
         except openai.OpenAIError as err:
-            raise ValueError(err)
+            raise ValueError("AI Model problem in Problem statement feature.")
 
 
         content_list = response.choices[0].message.content.split('\n')
