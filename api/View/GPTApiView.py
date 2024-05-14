@@ -6,8 +6,7 @@ from rest_framework.decorators import action
 import openai
 import os
 
-from ..serializers import TwoVennSerializer
-from ..serializers import ThreeVennSerializer
+from ..Serializer.VennSerializer import TwoVennSerializer, ThreeVennSerializer
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
@@ -15,7 +14,6 @@ openai.api_key = OPENAI_API_KEY
 class GPTApiView(ViewSet):
     permission_classes = [AllowAny]
     serializer_class = None
-
 
     @action(detail=False, methods=['post', 'get'], serializer_class=TwoVennSerializer)
     def two_venn(self, request):
