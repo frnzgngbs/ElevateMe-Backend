@@ -6,6 +6,7 @@ class PotentialRootSerializer(serializers.Serializer):
     )
 
     def validate(self, data):
-        if data.get('list_of_whys') is None:
-            return serializers.ValidationError({"error": "Cannot take an empty list of whys."})
+        list_of_whys = data.get('list_of_whys')
+        if not list_of_whys:
+            raise serializers.ValidationError({"error": "Cannot take an empty list of whys."})
         return data
