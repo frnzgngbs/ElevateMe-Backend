@@ -9,7 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "password", "email"]
 
     def validate_password(self, data):
-        if len(data.get('password')) < 6:
+        password = data
+        if len(password) < 6:
             raise serializers.ValidationError({'error': "Password must be at least of length 6."})
         return data
 

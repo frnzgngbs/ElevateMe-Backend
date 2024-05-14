@@ -15,12 +15,7 @@ class UserView(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         # Handle business logic
-        password = request.data.get('password')
-
-        if password is None or len(password) < 6:
-            return Response({'error': "Password must be at least of length 6."}, status=HTTP_400_BAD_REQUEST)
-
-        print(f"args = {args}")
-        print(f"kwargs = {kwargs}")
-
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            return super().create(request, *args, **kwargs)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
