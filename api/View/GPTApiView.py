@@ -6,25 +6,54 @@ from rest_framework.decorators import action
 import openai
 import os
 
+from ..serializers import TwoVennSerializer
+from ..serializers import ThreeVennSerializer
+
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
 
-
-# Create your views here.
 class GPTApiView(ViewSet):
     permission_classes = [AllowAny]
+    serializer_class = None
 
-    @action(detail=False, methods=['post'])
-    def problem_statement(self, request):
+
+    @action(detail=False, methods=['post', 'get'], serializer_class=TwoVennSerializer)
+    def two_venn(self, request):
+        field1 = request.data.get('field1')
+        field2 = request.data.get('field2')
+        field_filter = request.data.get('filter')
+
+        prompt = two_prompt(
+            field1=field1,
+            field2=field2,
+            field_filter=field_filter)
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "Disregard if the question is out of the context  and seems like a nonsense to you. Also,"
+                            "in generating responses, you should give it directly without explanation."
+                            "Only generate problem statement."},
+                {"role": "user", "content": prompt}]
+        )
+
+        problem_statement = response.choices[0].message.content.split('\n')
+
+        return Response({"response": problem_statement}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post', 'get'], serializer_class=ThreeVennSerializer)
+    def three_venn(self, request):
         field1 = request.data.get('field1')
         field2 = request.data.get('field2')
         field3 = request.data.get('field3')
-        field4_filter = request.data.get('filter')
+        field_filter = request.data.get('filter')
 
-        if filter is not None:
-            prompt = f"Generate 5 problem statement given these 3 fields: {field1}, {field2}s, {field3}."
-        else:
-            prompt = f"Generate 5 problem statement given these 3 fields: {field1}, {field2}, {field3}. Apply filter: {field4_filter}"
+        prompt = three_prompt(
+            field1=field1,
+            field2=field2,
+            field3=field3,
+            field_filter=field_filter)
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -61,7 +90,7 @@ class GPTApiView(ViewSet):
 
         five_whys = response.choices[0].message.content.split('\n')
 
-        return Response({"response": five_whys})
+        return Response({"response": five_whys}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def potential_root(self, request):
@@ -88,8 +117,9 @@ class GPTApiView(ViewSet):
 
         root_problem = response.choices[0].message.content.split('\n')
 
+        return Response({"response": root_problem}, status=status.HTTP_200_OK)
 
-        return Response({"response": root_problem})
+    @action(detail=False, methods=['post'])
     def five_hmws(self, request):
         root_problem = request.data.get('root_problem')
 
@@ -110,8 +140,29 @@ class GPTApiView(ViewSet):
 
         five_hmws = response.choices[0].message.content.split('\n')
 
-        return Response({"response": five_hmws})
+        return Response({"response": five_hmws}, status=status.HTTP_200_OK)
 
-
+    @action(detail=False, methods=['post'])
     def elevator_pitch(self, request):
         pass
+
+
+
+def three_prompt(**kwargs):
+    if kwargs.get('field_filter') is not None:
+        return f"Generate 5 problem statement given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}."
+    else:
+        return (
+            f"Generate 5 problem statement given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. "
+            f"Apply filter: {kwargs.get('field_filter')}")
+
+def two_prompt(**kwargs):
+    if kwargs.get('field_filter') is not None:
+        return (
+            f"Generate 5 problem statement given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}."
+        )
+    else:
+        return (
+            f"Generate 5 problem statement given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. "
+            f"Apply filter: {kwargs.get('field_filter')}"
+        )
