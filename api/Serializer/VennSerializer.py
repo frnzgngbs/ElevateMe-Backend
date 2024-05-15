@@ -1,20 +1,27 @@
 from rest_framework import serializers
 
-class TwoVennSerializer(serializers.Serializer):
-    field1 = serializers.CharField()
-    field2 = serializers.CharField()
-    filter_field = serializers.CharField(required=False)
+from .UserSerializer import UserSerializer
+from ..Model.VennDiagramModel import TwoVennDiagram, ThreeVennDiagram
 
-    def validate(self, data):
-        if data.get('field1') == data.get('field2'):
-            raise serializers.ValidationError({"error": "field1 and field2 must be different."})
-        return data
+class TwoVennSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = TwoVennDiagram
+        fields = '__all__'
 
-class ThreeVennSerializer(serializers.Serializer):
-    field1 = serializers.CharField()
-    field2 = serializers.CharField()
-    field3 = serializers.CharField()
-    filter_field = serializers.CharField(required=False)
+    def create(self, validated_data):
+        return TwoVennDiagram.objects.create(**validated_data)
+
+class ThreeVennSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = ThreeVennDiagram
+        fields = '__all__'
+
+
+    def create(self, validated_data):
+        return ThreeVennDiagram.objects.create(**validated_data)
+
 
     def validate(self,data):
         if data['field1'] == data['field2'] or data['field1'] == data['field3'] or data['field2'] == data['field3']:
