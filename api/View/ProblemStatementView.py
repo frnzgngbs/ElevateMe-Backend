@@ -19,7 +19,7 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            problem_statement = serializer.save()
+            serializer.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 

@@ -12,7 +12,6 @@ class VennDiagram(models.Model):
         abstract = True
 
 class TwoVennDiagram(VennDiagram):
-    pass
     def __str__(self):
         return f"{self.field1} | {self.field2}"
 
