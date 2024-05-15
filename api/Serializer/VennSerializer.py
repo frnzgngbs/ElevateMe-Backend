@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from .UserSerializer import UserSerializer
 from ..Model.VennDiagramModel import TwoVennDiagram, ThreeVennDiagram
 
 class TwoVennSerializer(serializers.ModelSerializer):
@@ -11,6 +10,7 @@ class TwoVennSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(validated_data)
         return TwoVennDiagram.objects.create(**validated_data)
+
 
 class ThreeVennSerializer(serializers.ModelSerializer):
     class Meta:
