@@ -5,7 +5,8 @@ from rest_framework.decorators import action
 import openai
 import os
 
-from ..Serializer import FiveWhySerializer, FiveHmwSerializer
+from ..Serializer.FiveWhySerializer import FiveWhySerializer
+from ..Serializer.FiveHmwSerializer import FiveHmwSerializer
 from ..Serializer.PotentialRootSerializer import PotentialRootSerializer
 from ..Serializer.VennSerializer import TwoVennSerializer, ThreeVennSerializer
 
@@ -115,7 +116,8 @@ class GPTApiView(viewsets.GenericViewSet):
 
             prompt = (
                 f"Generate five whys to uncover the underlying issue behind {selected_problem}. "
-                "Make it relevant to the selected problem and understandable."
+                "Make it relevant to the selected problem and understandable. Also,"
+                "in generating responses, you should give it directly without explanation."
             )
 
             response = openai.ChatCompletion.create(
@@ -143,7 +145,8 @@ class GPTApiView(viewsets.GenericViewSet):
 
             prompt = (
                 f"Generate five How Might We (HMW) given the root potential problem: {root_problem}. "
-                "Make it relevant to the root problem and understandable."
+                "Make it relevant to the root problem and understandable. Also,"
+                "in generating responses, you should give it directly without explanation."
             )
 
             response = openai.ChatCompletion.create(
