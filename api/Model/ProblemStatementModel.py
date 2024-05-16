@@ -12,5 +12,4 @@ class TwoVennProblemStatementModel(ProblemStatementModel):
 
 
 class ThreeVennProblemStatementModel(ProblemStatementModel):
-    field3 = models.TextField(null=False)
     venn = models.ForeignKey(ThreeVennDiagram, on_delete=models.CASCADE)

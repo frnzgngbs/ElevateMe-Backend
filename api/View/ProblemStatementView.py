@@ -19,11 +19,21 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            problem_statement = serializer.save()
+            serializer.save()
+
+            # TODO: Uncomment below if naa nay authentication
+            # serializer.save(self.request.user)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    # TODO: Uncomment below if naa nay authentication. As of now, kani lang sa for temporary
+"""
+    def get_queryset(self):
+        return TwoVennProblemStatementModel.objects.filter(user=self.request.user)
+"""
 
 class ThreeVennProblemStatementView(mixins.ListModelMixin,
                                     mixins.CreateModelMixin,
@@ -31,3 +41,21 @@ class ThreeVennProblemStatementView(mixins.ListModelMixin,
     permission_classes = [AllowAny]
     queryset = ThreeVennProblemStatementModel.objects.all()
     serializer_class = ThreeProblemStatementSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            # TODO: Uncomment below if naa nay authentication
+            # serializer.save(self.request.user)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # TODO: Uncomment below if naa nay authentication. As of now, kani lang sa for temporary
+    """
+        def get_queryset(self):
+            return TwoVennProblemStatementModel.objects.filter(user=self.request.user)
+    """
