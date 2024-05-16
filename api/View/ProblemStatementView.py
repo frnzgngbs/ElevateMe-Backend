@@ -28,11 +28,11 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
     # TODO: Uncomment below if naa nay authentication. As of now, kani lang sa for temporary
 """
     def get_queryset(self):
         return TwoVennProblemStatementModel.objects.filter(user=self.request.user)
-
 """
 
 class ThreeVennProblemStatementView(mixins.ListModelMixin,
