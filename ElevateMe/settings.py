@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",
     "corsheaders",
+    'rest_framework.authtoken',  # Use TokenAuthentication
 
 ]
 
@@ -88,7 +89,7 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '3306',
-        'OPTIONS':{'init_command': 'SET SQL_MODE=STRICT_TRANS_TABLES'},
+        'OPTIONS': {'init_command': 'SET SQL_MODE=STRICT_TRANS_TABLES'},
 
     }
 }
@@ -123,6 +124,9 @@ USE_I18N = True
 USE_TZ = True
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # <-- And here
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
         'rest_framework.permissions.IsAuthenticated',
