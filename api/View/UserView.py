@@ -1,7 +1,7 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -29,16 +29,16 @@ class UserView(mixins.ListModelMixin,
 
         if user is None:
             print(f"Authentication failed for user: {username}")
-            return Response({"error": "Invalid credentials."})
+            return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the user account is active
         if not user.is_active:
             return Response({"error": "User account is inactive."})
 
-        token = Token.objects.get_or_create(user=user)
+        token, created = Token.objects.get_or_create(user=user)
         return Response({"token": token.key})
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
         if request.user is None:
             return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
