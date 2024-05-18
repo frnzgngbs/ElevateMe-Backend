@@ -14,6 +14,10 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'error': "Password must be at least of length 6."})
         return data
 
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('Email already exists.')
+        return value
 
     def create(self, validated_data):
         user = User(
