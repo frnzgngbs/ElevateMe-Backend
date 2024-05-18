@@ -1,6 +1,6 @@
 from rest_framework import status, viewsets
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
 import openai
 import os
@@ -28,7 +28,7 @@ class GPTApiView(viewsets.GenericViewSet):
         elif self.action == 'five_hmws':
             return FiveHmwSerializer
 
-    @action(detail=False, methods=['post'], name="Two Venn Diagram")
+    @action(detail=False, methods=['post'], name="Two Venn Diagram", permission_classes=[IsAuthenticated])
     def two_venn(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
