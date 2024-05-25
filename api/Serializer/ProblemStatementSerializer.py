@@ -38,6 +38,7 @@ class ThreeProblemStatementSerializer(serializers.ModelSerializer):
         user = validated_data.pop("user", None)
         if venn:
             three_venn_serializer = ThreeVennSerializer(data=venn)
+            print("DID WE COME IN HERE?")
             if three_venn_serializer.is_valid():
                 venn = three_venn_serializer.save(user=user)
                 problem_statement = ThreeVennProblemStatementModel.objects.create(venn=venn, **validated_data, user=user)

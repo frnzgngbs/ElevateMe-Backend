@@ -79,6 +79,7 @@ class GPTApiView(viewsets.GenericViewSet):
             return Response({"response": problem_statement}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # localhost:8000/api/potential_root/
     @action(detail=False, methods=['post'], name="Potential Root Problem")
     def potential_root(self, request):
         serializer = self.get_serializer(data=request.data)
