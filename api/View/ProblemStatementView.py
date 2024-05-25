@@ -18,17 +18,26 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
     serializer_class = TwoVennProblemStatementSerializer
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            # TODO: Uncomment below if naa nay authentication
-            serializer.save(self.request.user)
+        statements = request.data.pop("statement")
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        results = []
+        errors = []
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        for statement in statements:
+            item_data = request.data.copy()
+            item_data['statement'] = statement
+            item_data['user'] = request.user.pk
 
-    # TODO: Uncomment below if naa nay authentication. As of now, kani lang sa for temporary
+            serializer = self.get_serializer(data=item_data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                results.append(serializer.data)
+            else:
+                errors.append(serializer.errors)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(results, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         return TwoVennProblemStatementModel.objects.filter(user=self.request.user)

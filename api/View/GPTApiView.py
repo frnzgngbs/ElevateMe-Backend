@@ -173,10 +173,10 @@ def three_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:
         return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}."
     else:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}"
+        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}."
 
 def two_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}."
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Never ever include numbering on the generated responses."
     else:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}"
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}. "
