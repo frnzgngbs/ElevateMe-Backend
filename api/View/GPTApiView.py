@@ -50,7 +50,14 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             problem_statement = response.choices[0].message.content.split('\n')
-            return Response({"response": problem_statement}, status=status.HTTP_200_OK)
+
+            cleaned_problem_statement = []
+
+            for i in problem_statement:
+                cleaned_problem_statement.append(i[2:].strip())
+
+
+            return Response({"response": cleaned_problem_statement}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Three Venn Diagram")
@@ -70,15 +77,23 @@ class GPTApiView(viewsets.GenericViewSet):
                     {"role": "system",
                      "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
                                 "in generating responses, you should give it directly without explanation."
-                                "Only generate problem statement."},
+                                "Only generate problem statements."},
                     {"role": "user", "content": prompt}
                 ]
             )
 
             problem_statement = response.choices[0].message.content.split('\n')
-            return Response({"response": problem_statement}, status=status.HTTP_200_OK)
+
+            cleaned_problem_statement = []
+            for i in problem_statement:
+                cleaned_problem_statement.append(i[2:].strip())
+
+            # print(cleaned_problem_statement)
+
+            return Response({"response": cleaned_problem_statement}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # localhost:8000/api/potential_root/
     @action(detail=False, methods=['post'], name="Potential Root Problem")
     def potential_root(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -172,10 +187,10 @@ def three_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:
         return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}."
     else:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}"
+        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}."
 
 def two_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:
         return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}."
     else:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}"
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}. "

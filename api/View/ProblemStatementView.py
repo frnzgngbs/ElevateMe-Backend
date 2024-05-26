@@ -3,6 +3,7 @@ from rest_framework import mixins
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from ..Model.VennDiagramModel import TwoVennDiagram, ThreeVennDiagram
 from ..Serializer.ProblemStatementSerializer import TwoVennProblemStatementSerializer, \
     ThreeProblemStatementSerializer
 
@@ -17,23 +18,30 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
     serializer_class = TwoVennProblemStatementSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        statements = request.data.pop("statement")
 
-            # TODO: Uncomment below if naa nay authentication
-            # serializer.save(self.request.user)
+        results = []
+        errors = []
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        for statement in statements:
+            item_data = request.data.copy()
+            item_data['statement'] = statement
+            item_data['user'] = request.user.pk
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=item_data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                results.append(serializer.data)
+            else:
+                errors.append(serializer.errors)
 
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(results, status=status.HTTP_201_CREATED)
 
-    # TODO: Uncomment below if naa nay authentication. As of now, kani lang sa for temporary
-"""
     def get_queryset(self):
         return TwoVennProblemStatementModel.objects.filter(user=self.request.user)
-"""
+
 
 class ThreeVennProblemStatementView(mixins.ListModelMixin,
                                     mixins.CreateModelMixin,
@@ -43,19 +51,28 @@ class ThreeVennProblemStatementView(mixins.ListModelMixin,
     serializer_class = ThreeProblemStatementSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        print(request.data)
 
-            # TODO: Uncomment below if naa nay authentication
-            # serializer.save(self.request.user)
+        statements = request.data.pop("statement")
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        results = []
+        errors = []
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        for statement in statements:
+            item_data = request.data.copy()
+            item_data['statement'] = statement
+            item_data['user'] = request.user.pk
 
-    # TODO: Uncomment below if naa nay authentication. As of now, kani lang sa for temporary
-    """
-        def get_queryset(self):
-            return TwoVennProblemStatementModel.objects.filter(user=self.request.user)
-    """
+            serializer = self.get_serializer(data=item_data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                results.append(serializer.data)
+            else:
+                errors.append(serializer.errors)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(results, status=status.HTTP_201_CREATED)
+
+    def get_queryset(self):
+        return ThreeVennProblemStatementModel.objects.filter(user=self.request.user)
