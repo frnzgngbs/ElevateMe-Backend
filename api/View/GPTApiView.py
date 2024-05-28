@@ -14,8 +14,6 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
 
 class GPTApiView(viewsets.GenericViewSet):
-    permission_classes = [AllowAny]
-
     def get_serializer_class(self):
         if self.action == 'three_venn':
             return ThreeVennSerializer

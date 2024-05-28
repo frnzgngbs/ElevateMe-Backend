@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework import mixins
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from ..Model.VennDiagramModel import TwoVennDiagram, ThreeVennDiagram
@@ -12,8 +12,11 @@ from ..Model.ProblemStatementModel import TwoVennProblemStatementModel, ThreeVen
 
 class TwoVennProblemStatementView(mixins.ListModelMixin,
                                   mixins.CreateModelMixin,
+                                  mixins.DestroyModelMixin,
+                                  mixins.RetrieveModelMixin,
+                                  mixins.UpdateModelMixin,
                                   viewsets.GenericViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = TwoVennProblemStatementModel.objects.all()
     serializer_class = TwoVennProblemStatementSerializer
 
@@ -42,16 +45,29 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
     def get_queryset(self):
         return TwoVennProblemStatementModel.objects.filter(user=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+
+        instance = self.get_object()
+        print(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ThreeVennProblemStatementView(mixins.ListModelMixin,
                                     mixins.CreateModelMixin,
+                                    mixins.DestroyModelMixin,
+                                    mixins.UpdateModelMixin,
                                     viewsets.GenericViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = ThreeVennProblemStatementModel.objects.all()
     serializer_class = ThreeProblemStatementSerializer
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
 
         statements = request.data.pop("statement")
 
@@ -73,6 +89,17 @@ class ThreeVennProblemStatementView(mixins.ListModelMixin,
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(results, status=status.HTTP_201_CREATED)
-
     def get_queryset(self):
         return ThreeVennProblemStatementModel.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        print(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
