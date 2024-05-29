@@ -7,6 +7,7 @@ from ..Serializer.VennSerializer import TwoVennSerializer, ThreeVennSerializer
 class TwoVennProblemStatementSerializer(serializers.ModelSerializer):
     venn = TwoVennSerializer()  # Remove read_only=True
 
+
     class Meta:
         model = TwoVennProblemStatementModel
         fields = '__all__'
