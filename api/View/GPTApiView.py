@@ -116,7 +116,7 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             root_problem = response.choices[0].message.content.split('\n')
-            return Response({"response": root_problem}, status=status.HTTP_200_OK)
+            return Response({"root": root_problem}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Five Whys")
@@ -178,7 +178,7 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             five_hmws = response.choices[0].message.content.split('\n')
-            return Response({"response": five_hmws}, status=status.HTTP_200_OK)
+            return Response({"five_hmws": five_hmws}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Elevator Pitch")
