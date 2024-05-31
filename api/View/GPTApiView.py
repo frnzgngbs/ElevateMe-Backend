@@ -100,8 +100,8 @@ class GPTApiView(viewsets.GenericViewSet):
             joined_whys = ", ".join(list_of_whys)
 
             prompt = (
-                f"Generate potential root problem to uncover the underlying issue behind {joined_whys}. "
-                "Make it relevant to the list of whys and understandable."
+                f"Generate 1 potential root problem to uncover the underlying issue behind {joined_whys}. "
+                "Make sure it is relevant to the list of whys and understandable."
             )
 
             response = openai.ChatCompletion.create(
@@ -178,7 +178,12 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             five_hmws = response.choices[0].message.content.split('\n')
-            return Response({"five_hmws": five_hmws}, status=status.HTTP_200_OK)
+            filtered_response = []
+
+            for item in five_hmws:
+                filtered_response.append(item[2:])
+
+            return Response({"five_hmws": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Elevator Pitch")
