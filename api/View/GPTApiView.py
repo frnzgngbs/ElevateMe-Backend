@@ -42,7 +42,7 @@ class GPTApiView(viewsets.GenericViewSet):
                     {"role": "system",
                      "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
                                 "in generating responses, you should give it directly without explanation."
-                                "Only generate problem statement."},
+                                "Only generate problem statement. Remember to take note to seperate each statements with '\n'"},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -116,7 +116,7 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             root_problem = response.choices[0].message.content.split('\n')
-            return Response({"response": root_problem}, status=status.HTTP_200_OK)
+            return Response({"root": root_problem}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Five Whys")
@@ -145,7 +145,11 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             five_whys = response.choices[0].message.content.split('\n')
-            return Response({"response": five_whys}, status=status.HTTP_200_OK)
+            filtered_response = []
+            for i in five_whys:
+                filtered_response.append(i[2:].strip())
+            print(filtered_response)
+            return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -174,7 +178,7 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             five_hmws = response.choices[0].message.content.split('\n')
-            return Response({"response": five_hmws}, status=status.HTTP_200_OK)
+            return Response({"five_hmws": five_hmws}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Elevator Pitch")
