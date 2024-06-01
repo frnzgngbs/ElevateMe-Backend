@@ -15,6 +15,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
 
 class GPTApiView(viewsets.GenericViewSet):
+
     def get_serializer_class(self):
         if self.action == 'three_venn':
             return ThreeVennSerializer
@@ -95,33 +96,6 @@ class GPTApiView(viewsets.GenericViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # localhost:8000/api/potential_root/
-    @action(detail=False, methods=['post'], name="Potential Root Problem")
-    def potential_root(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            list_of_whys = request.data.get('list_of_whys')
-            joined_whys = ", ".join(list_of_whys)
-
-            prompt = (
-                f"Generate 1 potential root problem to uncover the underlying issue behind {joined_whys}. "
-                "Make sure it is relevant to the list of whys and understandable."
-            )
-
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system",
-                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
-                                "in generating responses, you should give it directly without explanation."
-                     },
-                    {"role": "user", "content": prompt}
-                ]
-            )
-
-            root_problem = response.choices[0].message.content.split('\n')
-            return Response({"root": root_problem}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(detail=False, methods=['post'], name="Five Whys")
     def five_whys(self, request):
         print(request.data)
@@ -156,6 +130,33 @@ class GPTApiView(viewsets.GenericViewSet):
             return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['post'], name="Potential Root Problem")
+    def potential_root(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            list_of_whys = request.data.get('list_of_whys')
+            joined_whys = ", ".join(list_of_whys)
+
+            prompt = (
+                f"Generate 1 potential root problem to uncover the underlying issue behind {joined_whys}. "
+                "Make sure it is relevant to the list of whys and understandable."
+            )
+
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system",
+                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
+                                "in generating responses, you should give it directly without explanation."
+                     },
+                    {"role": "user", "content": prompt}
+                ]
+            )
+
+            root_problem = response.choices[0].message.content.split('\n')
+            return Response({"root": root_problem}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(detail=False, methods=['post'], name="Five How Might We")
     def five_hmws(self, request):
@@ -185,31 +186,40 @@ class GPTApiView(viewsets.GenericViewSet):
             filtered_response = []
 
             for item in five_hmws:
-                filtered_response.append(item[2:])
+                filtered_response.append(item[3:])
 
             return Response({"five_hmws": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'], name="Elevator Pitch")
+    @action(detail=False, methods=['post'], name="Elevator Pitch", permission_classes=[AllowAny])
     def elevator_pitch(self, request):
-        serializer = self.get_serializer(data=request.data)
+        elevator_dict = {'list_of_hmws': request.data['list_of_hmws']}
+        # print(request.data)
+        serializer = self.get_serializer(data=elevator_dict)
+
+        list_of_whys = ", ".join(list(request.data.get("list_of_whys")))
+        # print(list_of_whys)
 
         serializer.is_valid(raise_exception=True)
         list_of_hmws = request.data.get('list_of_hmws')
+        root_problem = request.data.get('root_problem')
 
         joined_hmws = ", ".join(list_of_hmws)
 
         prompt = (
-            f"I want you to generate an elevator pitch by having these list of whys: {joined_hmws}. Take note to follow this format.\n"
+            f"I want you to generate an elevator pitch following the format and be providing the information below. Take note to follow this format.\n"
             "FOR: [the target consumer]\n"
             "WHO: [specific needs, requirements, demands, criteria],\n"
             "WE PROVIDE: [solution or description],\n"
             "THAT: [gives specific benefits/value to clients]\n"
             "UNLIKE: [the competition],\n"
             "WHO: [provide a solution, features, functions, benefits]\n"
-            "OUR: SOLUTION [better approach, solution, functions, benefits, technology],\n"
+            "OUR SOLUTION: [better approach, solution, functions, benefits, technology],\n"
             "THAT: [offers a better customer experience]. Please answer all the words that are capitalized."
-            "Also, for every keywords answered, it should only be spaced 1 time only so I can have a proper string manipulation."
+            "For every keywords answered, it should only be spaced 1 time only so I can have a proper string manipulation."
+            f"Now I will be giving you all of the context that you need starting with the problem statement:  {request.data.get('problem_statement')},"
+            f"followed by the list of whys: {list_of_whys}, followed by the root potential problem: {root_problem}, and lastly, the"
+            f"How might wes (HMWs): {joined_hmws}. All context are given."
         )
 
         response = openai.ChatCompletion.create(
@@ -222,9 +232,11 @@ class GPTApiView(viewsets.GenericViewSet):
             ]
         )
 
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
 
         gpt_response = response.choices[0].message.content.split('\n')
+
+        print(gpt_response)
 
         returning_response = []
         for keyword in gpt_response:
