@@ -33,8 +33,10 @@ class TwoVennProblemStatementView(mixins.ListModelMixin,
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def update(self, request, *args, **kwargs):
 
+        # Retrieve the instance of a TwoVennProblemStatementModel by using get_object method. Internally it has a look up field
         instance = self.get_object()
-        print(instance)
+
+
         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
         if serializer.is_valid():
@@ -48,6 +50,7 @@ class ThreeVennProblemStatementView(mixins.ListModelMixin,
                                     mixins.CreateModelMixin,
                                     mixins.DestroyModelMixin,
                                     mixins.UpdateModelMixin,
+                                    mixins.RetrieveModelMixin,
                                     viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = ThreeVennProblemStatementModel.objects.all()
@@ -66,12 +69,13 @@ class ThreeVennProblemStatementView(mixins.ListModelMixin,
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
+
         instance = self.get_object()
-        print(instance)
         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
+            # print(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

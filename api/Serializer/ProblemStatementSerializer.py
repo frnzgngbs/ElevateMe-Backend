@@ -25,6 +25,21 @@ class TwoVennProblemStatementSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError({"error": "Cannot save a problem statement without venn diagram."})
 
+    def update(self, instance, validated_data):
+        venn_data = validated_data.pop('venn', None)
+        user = validated_data.pop('user', None)
+
+        if venn_data:
+            venn_instance = instance.venn
+            venn_serializer = TwoVennSerializer(venn_instance, data=venn_data)
+            if venn_serializer.is_valid():
+                venn_serializer.save()
+
+        instance.statement = validated_data.get('statement', instance.statement)
+        instance.user = user or instance.user
+        instance.save()
+        return instance
+
 
 class ThreeProblemStatementSerializer(serializers.ModelSerializer):
     venn = ThreeVennSerializer()
@@ -44,3 +59,20 @@ class ThreeProblemStatementSerializer(serializers.ModelSerializer):
                 return problem_statement
         else:
             raise serializers.ValidationError({"error": "Cannot save a problem statement without venn diagram."})
+
+    def update(self, instance, validated_data):
+        venn_data = validated_data.pop('venn', None)
+        user = validated_data.pop('user', None)
+        # print(validated_data)
+
+
+        if venn_data:
+            # So if we passed a data venn it will go here.
+            venn_instance = instance.venn
+            venn_serializer = TwoVennSerializer(venn_instance, data=venn_data)
+            if venn_serializer.is_valid():
+                venn_serializer.save()
+        instance.statement = validated_data.get('statement', instance.statement)
+        instance.user = user or instance.user
+        instance.save()
+        return instance

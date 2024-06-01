@@ -134,10 +134,10 @@ class GPTApiView(viewsets.GenericViewSet):
             joined_whys = ", ".join(list_of_whys)
 
             prompt = (
-                f"Generate one potential root problem to uncover the underlying issue behind {joined_whys}. "
+                f"Generate one potential root problem to uncover the underlying issue behind these set of why's statement: {joined_whys}. "
                 f"And and this problem statement: {request.data.get('selected_statement')}."
                 "Make sure it is aligned, relevant, and concise to the list of whys and problem statement. It doesnt have"
-                "to be so long, just enough to be as detailed as it is."
+                "to be so long, give the bone of the idea. Directly give the potential root problem. Do not put any decoration."
             )
 
             response = openai.ChatCompletion.create(
@@ -157,14 +157,17 @@ class GPTApiView(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'], name="Five How Might We")
     def five_hmws(self, request):
-        serializer = self.get_serializer(data=request.data)
+        root_problem = request.data.get('root_problem')
+        serializer = self.get_serializer(data={'root_problem': root_problem})
 
         if serializer.is_valid:
-            root_problem = request.data.get('root_problem')
+            selected_statement = request.data.get('selected_statement')
+            list_of_whys = ", ".join(list(request.data.get('list_of_whys')))
 
             prompt = (
-                f"Generate five How Might We (HMW) given the root potential problem: {root_problem}. "
-                "Make it relevant to the root problem and understandable. Also,"
+                f"Generate only five How Might We given the root potential problem: {root_problem}, the first problem statement: {selected_statement},"
+                f"and a set of whys statement: {list_of_whys}. Just get the main idea and generate responses that is "
+                "relevant to the context provided and understandable. Also,"
                 "in generating responses, you should give it directly without explanation."
             )
 
@@ -183,6 +186,8 @@ class GPTApiView(viewsets.GenericViewSet):
 
             for item in five_hmws:
                 filtered_response.append(item[3:])
+
+            print(filtered_response)
 
             return Response({"five_hmws": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
