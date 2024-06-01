@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 import openai
 import os
 
+from ..Serializer.ElevatorPitchSerializer import ElevatorPitchSerializer
 from ..Serializer.FiveWhySerializer import FiveWhySerializer
 from ..Serializer.FiveHmwSerializer import FiveHmwSerializer
 from ..Serializer.PotentialRootSerializer import PotentialRootSerializer
@@ -25,6 +26,8 @@ class GPTApiView(viewsets.GenericViewSet):
             return FiveWhySerializer
         elif self.action == 'five_hmws':
             return FiveHmwSerializer
+        elif self.action == 'elevator_pitch':
+            return ElevatorPitchSerializer
 
     @action(detail=False, methods=['post'], name="Two Venn Diagram", permission_classes=[IsAuthenticated])
     def two_venn(self, request):
@@ -121,6 +124,7 @@ class GPTApiView(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'], name="Five Whys")
     def five_whys(self, request):
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid:
@@ -188,7 +192,49 @@ class GPTApiView(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'], name="Elevator Pitch")
     def elevator_pitch(self, request):
-        pass
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        list_of_hmws = request.data.get('list_of_hmws')
+
+        joined_hmws = ", ".join(list_of_hmws)
+
+        prompt = (
+            f"I want you to generate an elevator pitch by having these list of whys: {joined_hmws}. Take note to follow this format.\n"
+            "FOR: [the target consumer]\n"
+            "WHO: [specific needs, requirements, demands, criteria],\n"
+            "WE PROVIDE: [solution or description],\n"
+            "THAT: [gives specific benefits/value to clients]\n"
+            "UNLIKE: [the competition],\n"
+            "WHO: [provide a solution, features, functions, benefits]\n"
+            "OUR: SOLUTION [better approach, solution, functions, benefits, technology],\n"
+            "THAT: [offers a better customer experience]. Please answer all the words that are capitalized."
+            "Also, for every keywords answered, it should only be spaced 1 time only so I can have a proper string manipulation."
+        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."
+                 },
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        print(response.choices[0].message.content)
+
+        gpt_response = response.choices[0].message.content.split('\n')
+
+        returning_response = []
+        for keyword in gpt_response:
+            if keyword == "":
+                continue
+            index = keyword.index(':')
+            returning_response.append(keyword[index+1:].strip())
+
+        return Response({'elevator_pitch': returning_response})
+
 
 def three_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:

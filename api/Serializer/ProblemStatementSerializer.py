@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework import serializers
-from ..Model.ProblemStatementModel import  TwoVennProblemStatementModel, ThreeVennProblemStatementModel
+from ..Model.ProblemStatementModel import TwoVennProblemStatementModel, ThreeVennProblemStatementModel
 from ..Serializer.VennSerializer import TwoVennSerializer, ThreeVennSerializer
 
 class TwoVennProblemStatementSerializer(serializers.ModelSerializer):
