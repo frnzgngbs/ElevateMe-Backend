@@ -44,9 +44,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system",
-                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
-                                "in generating responses, you should give it directly without explanation."
-                                "Only generate problem statement. Remember to take note to seperate each statements with '\n'"},
+                     "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -77,9 +75,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system",
-                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
-                                "in generating responses, you should give it directly without explanation."
-                                "Only generate problem statements."},
+                     "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -115,8 +111,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system",
-                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
-                                "in generating responses, you should give it directly without explanation."
+                     "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."
                      },
                     {"role": "user", "content": prompt}
                 ]
@@ -132,22 +127,24 @@ class GPTApiView(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post'], name="Potential Root Problem")
     def potential_root(self, request):
-        serializer = self.get_serializer(data=request.data)
+        whys_dict = {"list_of_whys": request.data.get('list_of_whys')}
+        serializer = self.get_serializer(data=whys_dict)
         if serializer.is_valid():
             list_of_whys = request.data.get('list_of_whys')
             joined_whys = ", ".join(list_of_whys)
 
             prompt = (
-                f"Generate 1 potential root problem to uncover the underlying issue behind {joined_whys}. "
-                "Make sure it is relevant to the list of whys and understandable."
+                f"Generate one potential root problem to uncover the underlying issue behind {joined_whys}. "
+                f"And and this problem statement: {request.data.get('selected_statement')}."
+                "Make sure it is aligned, relevant, and concise to the list of whys and problem statement. It doesnt have"
+                "to be so long, just enough to be as detailed as it is."
             )
 
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system",
-                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
-                                "in generating responses, you should give it directly without explanation."
+                     "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."
                      },
                     {"role": "user", "content": prompt}
                 ]
@@ -175,8 +172,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system",
-                     "content": "Disregard if the question is out of the context and seems like nonsense to you. Also,"
-                                "in generating responses, you should give it directly without explanation."
+                     "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."
                      },
                     {"role": "user", "content": prompt}
                 ]
