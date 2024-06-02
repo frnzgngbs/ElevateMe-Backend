@@ -71,6 +71,7 @@ class ThreeVennProblemStatementView(mixins.ListModelMixin,
     def update(self, request, *args, **kwargs):
 
         instance = self.get_object()
+        # Since we set partial as true, we are not required to have all the datas needed.
         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
         if serializer.is_valid():
