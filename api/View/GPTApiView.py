@@ -105,8 +105,7 @@ class GPTApiView(viewsets.GenericViewSet):
 
             prompt = (
                 f"Generate five whys to uncover the underlying issue behind {selected_problem}. "
-                "Make it relevant to the selected problem and understandable. Strictly,"
-                "in generating responses, you should give it directly without doing anything else on the response."
+                f"Strictly just straight up the five whys  with no explanation. Separate each statement with a new line."
             )
 
             response = openai.ChatCompletion.create(
@@ -138,8 +137,7 @@ class GPTApiView(viewsets.GenericViewSet):
             prompt = (
                 f"Generate one potential root problem to uncover the underlying issue behind these set of why's statement: {joined_whys}. "
                 f"And and this problem statement: {request.data.get('selected_statement')}."
-                "Make sure it is aligned, relevant, and concise to the list of whys and problem statement. It doesnt have"
-                "to be so long, give the bone of the idea. Directly give the potential root problem. Do not put any decoration."
+                "Strictly, just give directly the potential problem without explanation and no unnecessary things."
             )
 
             response = openai.ChatCompletion.create(
