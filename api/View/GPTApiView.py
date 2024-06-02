@@ -251,12 +251,12 @@ class GPTApiView(viewsets.GenericViewSet):
 
 def three_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}."
+        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}.  Strictly, give the problem statements directly."
     else:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}."
+        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}. Strictly, give the problem statements directly."
 
 def two_prompt(**kwargs):
     if kwargs.get('field_filter') is not None:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}."
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Strictly, give the problem statements directly."
     else:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}. "
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}. Strictly, give the problem statements directly."
