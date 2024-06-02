@@ -51,7 +51,7 @@ class GPTApiView(viewsets.GenericViewSet):
 
             problem_statement = response.choices[0].message.content.split('\n')
 
-            cleaned_problem_statement = [i for i in problem_statement if i != ""]
+            # cleaned_problem_statement = [i for i in problem_statement if i != ""]
 
             filtered_response = []
 
@@ -59,7 +59,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 filtered_response.append(i[2:].strip())
 
 
-            return Response({"response": cleaned_problem_statement}, status=status.HTTP_200_OK)
+            return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], name="Three Venn Diagram")
