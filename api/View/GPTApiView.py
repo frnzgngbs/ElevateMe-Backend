@@ -36,9 +36,9 @@ class GPTApiView(viewsets.GenericViewSet):
         if serializer.is_valid():
             field1 = serializer.validated_data.get('field1')
             field2 = serializer.validated_data.get('field2')
-            field_filter = serializer.validated_data.get('filter_field')
+            filter = serializer.validated_data.get('filter')
 
-            prompt = two_prompt(field1=field1, field2=field2, field_filter=field_filter)
+            prompt = two_prompt(field1=field1, field2=field2, filter=filter)
 
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -51,10 +51,12 @@ class GPTApiView(viewsets.GenericViewSet):
 
             problem_statement = response.choices[0].message.content.split('\n')
 
-            cleaned_problem_statement = []
+            cleaned_problem_statement = [i for i in problem_statement if i != ""]
+
+            filtered_response = []
 
             for i in problem_statement:
-                cleaned_problem_statement.append(i[2:].strip())
+                filtered_response.append(i[2:].strip())
 
 
             return Response({"response": cleaned_problem_statement}, status=status.HTTP_200_OK)
@@ -67,9 +69,9 @@ class GPTApiView(viewsets.GenericViewSet):
             field1 = serializer.validated_data.get('field1')
             field2 = serializer.validated_data.get('field2')
             field3 = serializer.validated_data.get('field3')
-            field_filter = serializer.validated_data.get('filter_field')
+            filter = serializer.validated_data.get('filter')
 
-            prompt = three_prompt(field1=field1, field2=field2, field3=field3, field_filter=field_filter)
+            prompt = three_prompt(field1=field1, field2=field2, field3=field3, filter=filter)
 
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -103,8 +105,7 @@ class GPTApiView(viewsets.GenericViewSet):
 
             prompt = (
                 f"Generate five whys to uncover the underlying issue behind {selected_problem}. "
-                "Make it relevant to the selected problem and understandable. Also,"
-                "in generating responses, you should give it directly without explanation."
+                f"Strictly just straight up the five whys  with no explanation. Separate each statement with a new line."
             )
 
             response = openai.ChatCompletion.create(
@@ -136,8 +137,7 @@ class GPTApiView(viewsets.GenericViewSet):
             prompt = (
                 f"Generate one potential root problem to uncover the underlying issue behind these set of why's statement: {joined_whys}. "
                 f"And and this problem statement: {request.data.get('selected_statement')}."
-                "Make sure it is aligned, relevant, and concise to the list of whys and problem statement. It doesnt have"
-                "to be so long, give the bone of the idea. Directly give the potential root problem. Do not put any decoration."
+                "Strictly, just give directly the potential problem without explanation and no unnecessary things."
             )
 
             response = openai.ChatCompletion.create(
@@ -250,13 +250,14 @@ class GPTApiView(viewsets.GenericViewSet):
 
 
 def three_prompt(**kwargs):
-    if kwargs.get('field_filter') is not None:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}.  Strictly, give the problem statements directly."
+    print(kwargs)
+    if kwargs.get('filter') is None:
+        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')} separated by new line each statement.  Strictly, give the problem statements directly."
     else:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Apply filter: {kwargs.get('field_filter')}. Strictly, give the problem statements directly."
+        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}.  Also, always priority this specification {kwargs.get('filter')}. Separate responses by new line each statement. Strictly, give the problem statements directly."
 
 def two_prompt(**kwargs):
-    if kwargs.get('field_filter') is not None:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Strictly, give the problem statements directly."
+    if kwargs.get('filter') is None:
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')} separated by new line each statement. Strictly, give the problem statements directly."
     else:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}. Apply filter: {kwargs.get('field_filter')}. Strictly, give the problem statements directly."
+        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}.  Also, always priority this specification {kwargs.get('filter')}. Separate responses by new line each statement. Strictly, give the problem statements directly."

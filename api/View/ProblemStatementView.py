@@ -3,7 +3,7 @@ from rest_framework import mixins
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from ..Model.VennDiagramModel import TwoVennDiagram, ThreeVennDiagram
+from ..Model.VennDiagramModel import TwoVennDiagramModel, ThreeVennDiagramModel
 from ..Serializer.ProblemStatementSerializer import TwoVennProblemStatementSerializer, \
     ThreeProblemStatementSerializer
 

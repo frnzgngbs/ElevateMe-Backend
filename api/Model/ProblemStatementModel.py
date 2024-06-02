@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .VennDiagramModel import TwoVennDiagram, ThreeVennDiagram
+from .VennDiagramModel import TwoVennDiagramModel, ThreeVennDiagramModel
 class ProblemStatementModel(models.Model):
     statement = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -8,8 +8,8 @@ class ProblemStatementModel(models.Model):
         abstract = True
 
 class TwoVennProblemStatementModel(ProblemStatementModel):
-    venn = models.ForeignKey(TwoVennDiagram, on_delete=models.CASCADE)
+    venn = models.ForeignKey(TwoVennDiagramModel, on_delete=models.CASCADE)
 
 
 class ThreeVennProblemStatementModel(ProblemStatementModel):
-    venn = models.ForeignKey(ThreeVennDiagram, on_delete=models.CASCADE)
+    venn = models.ForeignKey(ThreeVennDiagramModel, on_delete=models.CASCADE)
