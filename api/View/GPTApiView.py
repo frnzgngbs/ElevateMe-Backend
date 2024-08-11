@@ -41,23 +41,23 @@ class GPTApiView(viewsets.GenericViewSet):
             prompt = two_prompt(field1=field1, field2=field2, filter=filter)
 
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."},
+                     "content": "Your tasked is to understand what the user's want."},
                     {"role": "user", "content": prompt}
                 ]
             )
+            print(response.choices[0].message.content)
 
             problem_statement = response.choices[0].message.content.split('\n')
 
-            # cleaned_problem_statement = [i for i in problem_statement if i != ""]
+            cleaned_problem_statement = [i for i in problem_statement if i != ""]
 
             filtered_response = []
 
-            for i in problem_statement:
+            for i in cleaned_problem_statement:
                 filtered_response.append(i[2:].strip())
-
 
             return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -74,23 +74,26 @@ class GPTApiView(viewsets.GenericViewSet):
             prompt = three_prompt(field1=field1, field2=field2, field3=field3, filter=filter)
 
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."},
+                     "content": "Your tasked is to understand what the user's want."},
                     {"role": "user", "content": prompt}
                 ]
             )
 
             problem_statement = response.choices[0].message.content.split('\n')
 
-            cleaned_problem_statement = []
-            for i in problem_statement:
-                cleaned_problem_statement.append(i[2:].strip())
+            cleaned_problem_statement = [i for i in problem_statement if i != ""]
+
+            filtered_response = []
+
+            for i in cleaned_problem_statement:
+                filtered_response.append(i[2:].strip())
 
             # print(cleaned_problem_statement)
 
-            return Response({"response": cleaned_problem_statement}, status=status.HTTP_200_OK)
+            return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # localhost:8000/api/potential_root/
@@ -104,24 +107,26 @@ class GPTApiView(viewsets.GenericViewSet):
 
 
             prompt = (
-                f"Generate five whys to uncover the underlying issue behind {selected_problem}. "
-                f"Strictly just give me the generated five whys without explaining anything. Separate each statement with a new line."
+                f"Generate five whys to uncover the underlying issue behind {selected_problem}. Directly give the five whys with no explanation."
             )
 
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."},
+                     "content": "Your tasked is to understand what the user's want."},
                     {"role": "user", "content": prompt}
                 ]
             )
+            print(response.choices[0].message.content)
 
             five_whys = response.choices[0].message.content.split('\n')
             filtered_response = []
             for i in five_whys:
                 filtered_response.append(i[2:].strip())
             print(filtered_response)
+
+
             return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -140,7 +145,7 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
                      "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."                     },
@@ -167,7 +172,7 @@ class GPTApiView(viewsets.GenericViewSet):
             )
 
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
                      "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."
@@ -225,7 +230,7 @@ class GPTApiView(viewsets.GenericViewSet):
         )
 
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system",
                  "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."
@@ -253,12 +258,12 @@ class GPTApiView(viewsets.GenericViewSet):
 def three_prompt(**kwargs):
     print(kwargs)
     if kwargs.get('filter') is None:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')} separated by new line each statement.  Strictly, give the problem statements directly."
+        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Strictly give the problem statement directly, not solutions."
     else:
-        return f"Generate 5 problem statements given these 3 fields: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}.  Also, always priority this specification {kwargs.get('filter')}. Separate responses by new line each statement. Strictly, give the problem statements directly."
+        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Take note of this specification {kwargs.get('filter')}. Strictly give the problem statement directly, not solutions."
 
 def two_prompt(**kwargs):
     if kwargs.get('filter') is None:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')} separated by new line each statement. Strictly, give the problem statements directly."
+        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}. Strictly give the problem statement directly, not solutions."
     else:
-        return f"Generate 5 problem statements given these 2 fields: {kwargs.get('field1')}, {kwargs.get('field2')}.  Also, always priority this specification {kwargs.get('filter')}. Separate responses by new line each statement. Strictly, give the problem statements directly."
+        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}.  Take note of this  specification {kwargs.get('filter')}. Strictly give the problem statement directly, not solutions."

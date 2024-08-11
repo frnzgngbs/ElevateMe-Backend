@@ -29,7 +29,7 @@ class UserView(mixins.ListModelMixin,
 
         if user is None:
             print(f"Authentication failed for user: {username}")
-            return Response({"error": "Invalid credentials."}, status=status.HTT_400_BAD_REQUEST)
+            return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if the user account is active
         if not user.is_active:
