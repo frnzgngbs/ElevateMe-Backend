@@ -4,11 +4,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from abc import ABC, abstractmethod
 
-from ..Model.VennDiagramModel import TwoVennDiagramModel, ThreeVennDiagramModel
 from ..Serializer.ProblemStatementSerializer import TwoVennProblemStatementSerializer, \
     ThreeProblemStatementSerializer
 
-from ..Model.ProblemStatementModel import TwoVennProblemStatementModel, ThreeVennProblemStatementModel
+from ..Model.ProblemStatement import TwoVennProblemStatementModel, ThreeVennProblemStatementModel
 
 
 class AbstractVennProblemStatementView(ABC, mixins.ListModelMixin,

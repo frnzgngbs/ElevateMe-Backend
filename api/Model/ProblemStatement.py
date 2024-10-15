@@ -1,9 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .VennDiagramModel import TwoVennDiagramModel, ThreeVennDiagramModel
+
+from .CustomUser import CustomUser
+from .VennDiagram import TwoVennDiagramModel, ThreeVennDiagramModel
 class ProblemStatementModel(models.Model):
     statement = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     class Meta:
         abstract = True
 
