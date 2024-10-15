@@ -3,7 +3,6 @@ from django.db import models
 from api.Model.RoomChannel import RoomChannel
 from api.Model.CustomUser import CustomUser
 
-
 class ChannelSubmission(models.Model):
     submitted_work = models.TextField()  # TextField for now
     date_submitted = models.DateTimeField(auto_now_add=True)

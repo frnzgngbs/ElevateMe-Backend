@@ -1,6 +1,6 @@
 from django.db import models
 
-from api.Model import ChannelSubmission
+from api.Model.ChannelSubmission import ChannelSubmission
 from api.Model.Comment import Comment
 from api.Model.CustomUser import CustomUser
 
