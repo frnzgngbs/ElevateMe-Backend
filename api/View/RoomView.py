@@ -36,9 +36,7 @@ class RoomView(viewsets.ModelViewSet):
             except CustomUser.DoesNotExist:
                 raise ValidationError(f"User with email {email} does not exist.")
 
-        print("BEFORE HERE")
         room = room_serializer.save(room_owner_id=room_owner)
-        print(room)
 
         for user in users:
             room_member_data = {

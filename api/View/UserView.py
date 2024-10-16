@@ -16,11 +16,13 @@ class UserView(mixins.ListModelMixin,
                viewsets.GenericViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == 'login':
             return LoginUserSerializer
+        if self.action == 'register':
+            return UserSerializer
         return self.serializer_class
 
     def get_object(self):
@@ -76,7 +78,7 @@ class UserView(mixins.ListModelMixin,
 
     @action(detail=False, methods=['post'])
     def register(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
             user = serializer.save()
@@ -89,3 +91,10 @@ class UserView(mixins.ListModelMixin,
             }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(detail=False, methods=['get'])
+    def get_currently_login(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

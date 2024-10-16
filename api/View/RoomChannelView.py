@@ -18,6 +18,9 @@ class RoomChannelView(mixins.RetrieveModelMixin,
     serializer_class = RoomChannelSerializer
 
 
+    def create(self, request, *args, **kwargs):
+        channel_members = request.data.get('channel_members')
+
     """
         Payload is the request.body from the front-end
         Payload in creating a room channel
