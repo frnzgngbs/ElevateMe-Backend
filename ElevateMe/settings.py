@@ -143,6 +143,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 STATIC_URL = 'static/'
 
+AUTH_USER_MODEL = 'api.CustomUser'
+
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
