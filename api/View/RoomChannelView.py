@@ -16,3 +16,14 @@ class RoomChannelView(mixins.RetrieveModelMixin,
     queryset = RoomChannel.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RoomChannelSerializer
+
+
+    """
+        Payload is the request.body from the front-end
+        Payload in creating a room channel
+        {
+            channel_name: string,
+            room_id: int,
+            channel_members: list[] only members sa room
+        }
+    """

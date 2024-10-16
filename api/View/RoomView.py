@@ -13,11 +13,19 @@ class RoomView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
+        """
+            Payload to create a room
+            {
+                members: list[]
+                room_name: string,
+            }
+        """
         members_data = request.data.get('members', [])
         room_name = request.data.get('room_name')
-        room_owner_id = request.data.get('room_owner_id')
 
-        room_serializer = self.get_serializer(data={"room_name": room_name, "room_owner_id": room_owner_id})
+        room_owner = CustomUser.objects.filter(email=request.user).first()
+
+        room_serializer = self.get_serializer(data={"room_name": room_name, "room_owner_id": room_owner})
         room_serializer.is_valid(raise_exception=True)
 
         users = []
@@ -28,7 +36,9 @@ class RoomView(viewsets.ModelViewSet):
             except CustomUser.DoesNotExist:
                 raise ValidationError(f"User with email {email} does not exist.")
 
-        room = room_serializer.save()
+        print("BEFORE HERE")
+        room = room_serializer.save(room_owner_id=room_owner)
+        print(room)
 
         for user in users:
             room_member_data = {
