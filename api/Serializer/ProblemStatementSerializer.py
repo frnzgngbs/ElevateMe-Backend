@@ -1,11 +1,10 @@
 
 from rest_framework import serializers
-from ..Model.ProblemStatementModel import TwoVennProblemStatementModel, ThreeVennProblemStatementModel
+from ..Model.ProblemStatement import TwoVennProblemStatementModel, ThreeVennProblemStatementModel
 from ..Serializer.VennSerializer import TwoVennSerializer, ThreeVennSerializer
 
 class TwoVennProblemStatementSerializer(serializers.ModelSerializer):
     venn = TwoVennSerializer()  # Remove read_only=True
-
 
     class Meta:
         model = TwoVennProblemStatementModel

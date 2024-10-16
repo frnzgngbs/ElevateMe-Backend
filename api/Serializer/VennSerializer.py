@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..Model.VennDiagramModel import TwoVennDiagramModel, ThreeVennDiagramModel
+from ..Model.VennDiagram import TwoVennDiagramModel, ThreeVennDiagramModel
 
 class TwoVennSerializer(serializers.ModelSerializer):
     filter = serializers.CharField(required=False, allow_null=True, allow_blank=True)

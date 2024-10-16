@@ -15,7 +15,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
 
 class GPTApiView(viewsets.GenericViewSet):
-
+    permission_classes = [IsAuthenticated]
     def get_serializer_class(self):
         if self.action == 'three_venn':
             return ThreeVennSerializer
@@ -30,7 +30,7 @@ class GPTApiView(viewsets.GenericViewSet):
         elif self.action == 'elevator_pitch':
             return ElevatorPitchSerializer
 
-    @action(detail=False, methods=['post'], name="Two Venn Diagram", permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['post'], name="Two Venn Diagram")
     def two_venn(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -148,7 +148,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."                     },
+                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."},
                     {"role": "user", "content": prompt}
                 ]
             )
