@@ -214,7 +214,7 @@ class GPTApiView(viewsets.GenericViewSet):
         print(joined_hmws)
 
         prompt = (
-            f"I want you to generate an elevator pitch following the format and be providing the information below. Take note to follow this format.\n"
+            f"Generate an elevator pitch given the context. Take note to follow this format.\n"
             "FOR: [the target consumer]\n"
             "WHO: [specific needs, requirements, demands, criteria],\n"
             "WE PROVIDE: [solution or description],\n"
@@ -226,7 +226,7 @@ class GPTApiView(viewsets.GenericViewSet):
             "For every keywords answered, it should only be spaced 1 time only so I can have a proper string manipulation."
             f"Now I will be giving you all of the context that you need starting with the problem statement:  {request.data.get('problem_statement')},"
             f"followed by the list of whys: {list_of_whys}, followed by the root potential problem: {root_problem}, and lastly, the"
-            f"How might wes (HMWs): {joined_hmws}. All context are given."
+            f"How might wes (HMWs): {joined_hmws}. Strictly follow."
         )
 
         response = openai.ChatCompletion.create(
@@ -260,10 +260,10 @@ def three_prompt(**kwargs):
     if kwargs.get('filter') is None:
         return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Strictly give the problem statement directly, not solutions."
     else:
-        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Take note of this specification {kwargs.get('filter')}. Strictly give the problem statement directly, not solutions."
+        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}, {kwargs.get('field3')}. Take note of this specification {kwargs.get('filter')}. Strictly give the problem statement directly, not solutions."  
 
 def two_prompt(**kwargs):
     if kwargs.get('filter') is None:
-        return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}. Strictly give the problem statement directly, not solutions."
+        return f"Generate 5 pr oblem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}. Strictly give the problem statement directly, not solutions."
     else:
         return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}.  Take note of this  specification {kwargs.get('filter')}. Strictly give the problem statement directly, not solutions."
