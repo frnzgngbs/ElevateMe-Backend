@@ -39,16 +39,16 @@ class UserView(mixins.ListModelMixin,
     @action(detail=False, methods=['post'])
     def login(self, request):
         print(request.data)
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        if not username or not password:
+        if not email or not password:
             return Response({"error": "Username and password are required."})
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=email, password=password)
 
         if user is None:
-            print(f"Authentication failed for user: {username}")
+            print(f"Authentication failed for user: {email}")
             return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
         token, created = Token.objects.get_or_create(user=user)
