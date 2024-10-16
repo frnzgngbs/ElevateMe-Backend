@@ -8,17 +8,15 @@ class CustomUser(AbstractBaseUser):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
 
-    date_joined = models.DateTimeField(default=timezone.now)
-
-    STUDENT = "S"
-    TEACHER = "T"
+    STUDENT = "STUDENT"
+    TEACHER = "TEACHER"
 
     ROLE_CHOICES = [
         (STUDENT, 'Student'),
         (TEACHER, 'Teacher'),
     ]
 
-    user_type = models.CharField(max_length=1, choices=ROLE_CHOICES, default=STUDENT)
+    user_type = models.TextField(choices=ROLE_CHOICES, default=STUDENT)
 
     USERNAME_FIELD = 'email'
 
