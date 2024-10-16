@@ -10,3 +10,12 @@ class RoomMember(models.Model):
 
     def __str__(self):
         return f''
+
+
+    '''
+        Payload is the request.body from the front-end
+        Payload in joining a room
+        {
+            room_code: str
+        }
+    '''
