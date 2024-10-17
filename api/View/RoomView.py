@@ -13,6 +13,7 @@ from api.Serializer.RoomSerializer import RoomSerializer
 class RoomView(mixins.ListModelMixin,
                mixins.RetrieveModelMixin,
                mixins.UpdateModelMixin,
+               mixins.CreateModelMixin,
                mixins.DestroyModelMixin,
                viewsets.GenericViewSet):
     queryset = Room.objects.all()
@@ -30,7 +31,6 @@ class RoomView(mixins.ListModelMixin,
             return RoomMember.objects.filter(room_id=room.id)
         else:
             return super().get_object()
-
 
     def create(self, request, *args, **kwargs):
         """
@@ -74,32 +74,28 @@ class RoomView(mixins.ListModelMixin,
 
     def update(self, request, *args, **kwargs):
         room = self.get_object()
-        members_to_be_added = request.data.get('room_members', [])
+        members_to_be_added = request.data.get('new_room_members', [])
 
         print(model_to_dict(room))
-        if room:
-            for member in members_to_be_added:
-                to_be_added = CustomUser.objects.get(email=member)
+        for member_email in members_to_be_added:
+            to_be_added = CustomUser.objects.get(email=member_email)
 
-                print(model_to_dict(to_be_added))
+            print(model_to_dict(to_be_added))
 
+            room_member_data = {
+                "room_id": room.id,
+                "member_id": to_be_added.id
+            }
 
-                room_member_data = {
-                    "room_id": room.id,
-                    "member_id": to_be_added.id
-                }
+            room_member_serializer = RoomMemberSerializer(data=room_member_data)
+            room_member_serializer.is_valid(raise_exception=True)
+            room_member_serializer.save()
 
-                room_member_serializer = RoomMemberSerializer(data=room_member_data)
-                room_member_serializer.is_valid(raise_exception=True)
-                room_member_serializer.save()
-
-                return Response({"message": "Successfully added to the room"}, status=status.HTTP_201_CREATED)
-        else:
-            raise ValidationError(f'Room with this id {pk} does not exist')
+        return Response({"message": "Successfully added to the room"}, status=status.HTTP_201_CREATED)
 
 
     @action(detail=True, methods=['get'])
-    def members(self, request, pk=None):
+    def members(self, request, pk):
         room_members = self.get_object()
 
         serializer = self.get_serializer(room_members, many=True)
