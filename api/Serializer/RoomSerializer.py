@@ -1,17 +1,17 @@
 from rest_framework import serializers
 
 from api.Model.Room import Room
-from api.Serializer.UserSerializer import UserSerializer
+from api.Serializer.RoomMemberSerializer import RoomMemberSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    room_members = serializers.ListField(
+    new_room_members = serializers.ListField(
         child=serializers.EmailField(),
         write_only=True,
         required=False
     )
-    room_owner_id = UserSerializer(read_only=True)
 
+    room_members = RoomMemberSerializer(source='roommember_set', many=True, read_only=True)
     class Meta:
         model = Room
         fields = '__all__'
@@ -40,3 +40,4 @@ class RoomSerializer(serializers.ModelSerializer):
     #             raise serializers.ValidationError(room_member_serializer.errors)
     #
     #     return room
+

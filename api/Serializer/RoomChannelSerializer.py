@@ -1,13 +1,17 @@
 from rest_framework import serializers
 
 from api.Model.RoomChannel import RoomChannel
+from api.Serializer.ChannelMemberSerializer import ChannelMemberSerializer
 
 
 class RoomChannelSerializer(serializers.ModelSerializer):
-    channel_members = serializers.ListSerializer(
+    channel_members = ChannelMemberSerializer(source='channelmember_set', many=True, read_only=True)
+
+    new_channel_member_emails = serializers.ListField(
         child=serializers.EmailField(),
         required=False,
-        allow_empty=True
+        allow_empty=True,
+        write_only=True
     )
 
     class Meta:
