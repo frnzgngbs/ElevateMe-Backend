@@ -53,6 +53,7 @@ class UserView(mixins.ListModelMixin,
             return Response({"error": "Username and password are required."})
 
         user = authenticate(username=email, password=password)
+        print(user)
 
         if user is None:
             print(f"Authentication failed for user: {email}")
