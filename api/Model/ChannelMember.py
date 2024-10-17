@@ -10,4 +10,4 @@ class ChannelMember(models.Model):
     channel_id = models.ForeignKey(RoomChannel, on_delete=models.CASCADE)  # Reference on what channel
 
     def __str__(self):
-        return f'{self.member_id.first_name} joined on {self.joined_date}'
+        return f'{self.member_id.email} joined on {self.joined_date}'

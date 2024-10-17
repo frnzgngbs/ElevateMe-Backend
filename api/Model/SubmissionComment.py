@@ -11,4 +11,4 @@ class SubmissionComment(models.Model):
     member_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Reference on who commented
 
     def __str__(self):
-        return f'{self.comment_id.content} by {self.member_id.first_name}'
+        return f'{self.comment_id.content} by {self.member_id.email}'
