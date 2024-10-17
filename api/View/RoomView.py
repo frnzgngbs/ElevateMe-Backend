@@ -73,13 +73,10 @@ class RoomView(mixins.ListModelMixin,
         return Response(room_serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
+        room = self.get_object()
         members_to_be_added = request.data.get('room_members', [])
 
-        room = Room.objects.get(id=pk)
-
         print(model_to_dict(room))
-
         if room:
             for member in members_to_be_added:
                 to_be_added = CustomUser.objects.get(email=member)

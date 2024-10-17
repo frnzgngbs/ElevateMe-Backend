@@ -65,3 +65,6 @@ class RoomChannelView(mixins.RetrieveModelMixin,
             channel_member_serializer.save()
 
         return Response(channel_serializer.data, status=status.HTTP_201_CREATED)
+
+
+
