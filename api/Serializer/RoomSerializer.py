@@ -5,7 +5,7 @@ from api.Serializer.RoomMemberSerializer import RoomMemberSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    new_room_members = serializers.ListField(
+    new_room_member_emails = serializers.ListField(
         child=serializers.EmailField(),
         write_only=True,
         required=False

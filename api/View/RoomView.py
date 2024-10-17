@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
+from api.Model.RoomChannel import RoomChannel
 from api.Model.RoomMember import RoomMember
+from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 from api.Serializer.RoomMemberSerializer import RoomMemberSerializer
 from api.Serializer.RoomSerializer import RoomSerializer
 
@@ -23,6 +25,8 @@ class RoomView(mixins.ListModelMixin,
     def get_serializer_class(self):
         if self.action == "members":
             return RoomMemberSerializer
+        if self.action == "channels":
+            return RoomChannelSerializer
         return RoomSerializer
 
     def get_object(self):
@@ -40,7 +44,7 @@ class RoomView(mixins.ListModelMixin,
                 room_name: string,
             }
         """
-        members_data = request.data.get('members', [])
+        members_data = request.data.get('new_room_member_emails', [])
         room_name = request.data.get('room_name')
 
         room_owner = CustomUser.objects.filter(email=request.user).first()
@@ -78,7 +82,10 @@ class RoomView(mixins.ListModelMixin,
 
         print(model_to_dict(room))
         for member_email in members_to_be_added:
-            to_be_added = CustomUser.objects.get(email=member_email)
+            try:
+                to_be_added = CustomUser.objects.get(email=member_email)
+            except CustomUser.DoesNotExist:
+                raise ValidationError(f"User with email: {member_email} does not exist")
 
             print(model_to_dict(to_be_added))
 
@@ -101,3 +108,16 @@ class RoomView(mixins.ListModelMixin,
         serializer = self.get_serializer(room_members, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @action(detail=True, methods=['get'])
+    def channels(self, request, pk):
+        room = self.get_object()
+
+        channels = RoomChannel.objects.filter(room_id=room.id)
+
+        serializer = self.get_serializer(channels, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+

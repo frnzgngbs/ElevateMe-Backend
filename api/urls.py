@@ -11,8 +11,8 @@ router.register('user', UserView)
 router.register('ai', GPTApiView, basename='ai')
 router.register('two_venn_ps', TwoVennProblemStatementView)
 router.register('three_venn_ps', ThreeVennProblemStatementView)
-router.register('room', RoomView)
-router.register('channel', RoomChannelView)
+router.register('rooms', RoomView)
+router.register('channels', RoomChannelView)
 
 urlpatterns = [
     path('', include(router.urls))  # Correct usage of include
