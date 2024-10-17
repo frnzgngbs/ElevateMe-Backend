@@ -16,7 +16,7 @@ class UserView(mixins.ListModelMixin,
                viewsets.GenericViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_serializer_class(self):
         if self.action == 'login':

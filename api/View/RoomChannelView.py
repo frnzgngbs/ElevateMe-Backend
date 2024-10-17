@@ -84,19 +84,25 @@ class RoomChannelView(mixins.RetrieveModelMixin,
 
     def update(self, request, *args, **kwargs):
         channel = self.get_object()
-        members_to_be_added = request.data.get('new_channel_members', [])
+        members_to_be_added = request.data.get('new_channel_member_emails', [])
         room_id = request.data.get('room_id')
 
-        room = Room.objects.get(pk=room_id)
+        try:
+            room = Room.objects.get(pk=room_id)
+        except Room.DoesNotExist:
+            raise ValidationError(f"Room with ID: {room_id} does not exist")
 
-        if not room:
-            raise ValidationError(f"Room with ID: {room.id} does not exist")
 
         print(model_to_dict(channel))
         print(members_to_be_added)
 
         for member_email in members_to_be_added:
             to_be_added = CustomUser.objects.get(email=member_email)
+
+            try:
+                to_be_added = CustomUser.objects.get(email=member_email)
+            except CustomUser.DoesNotExist:
+                raise ValidationError(f"User with email: {member_email} does not exist")
 
             print(model_to_dict(to_be_added))
 
