@@ -9,8 +9,9 @@ from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
 from api.Model.RoomMember import RoomMember
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
-from api.Serializer.RoomMemberSerializer import RoomMemberSerializer
+from api.Serializer.RoomMemberSerializer import RoomMemberSerializer, RoomMemberDeletionSerializer
 from api.Serializer.RoomSerializer import RoomSerializer
+
 
 class RoomView(mixins.ListModelMixin,
                mixins.RetrieveModelMixin,
@@ -25,8 +26,10 @@ class RoomView(mixins.ListModelMixin,
     def get_serializer_class(self):
         if self.action == "members":
             return RoomMemberSerializer
-        if self.action == "channels":
+        elif self.action == "channels":
             return RoomChannelSerializer
+        elif self.action == "delete_room_member":
+            return RoomMemberDeletionSerializer
         return RoomSerializer
 
     def get_object(self):
@@ -100,15 +103,13 @@ class RoomView(mixins.ListModelMixin,
 
         return Response({"message": "Successfully added to the room"}, status=status.HTTP_201_CREATED)
 
-
     @action(detail=True, methods=['get'])
     def members(self, request, pk):
         room_members = self.get_object()
+        if request.method == "GET":
+            serializer = self.get_serializer(room_members, many=True)
 
-        serializer = self.get_serializer(room_members, many=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def channels(self, request, pk):
@@ -120,4 +121,9 @@ class RoomView(mixins.ListModelMixin,
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+    @action(detail=True, methods=['delete'], url_path='members/(?P<member_id>[^/.]+)')
+    def delete_room_member(self, request, pk, member_id):
+        serializer = self.get_serializer(data={'room_id': pk, 'member_id': member_id})
+        serializer.is_valid(raise_exception=True)
+        serializer.delete()
+        return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)

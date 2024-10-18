@@ -29,6 +29,8 @@ class UserView(mixins.ListModelMixin,
         pk = self.kwargs.get('pk')
         email = self.kwargs.get('email')
 
+        print(email)
+
         if pk is not None:
             try:
                 return self.queryset.get(pk=pk)
