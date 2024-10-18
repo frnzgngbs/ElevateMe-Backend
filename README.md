@@ -18,15 +18,16 @@
 - PUT `/two_venn_ps/` - Saves Problem statement fron the Two Venn Diagram setting.
 - PUT `/three_venn_ps/` - Saves Problem statement fron the Three Venn Diagram setting.
 
-# Endpoints for Room
+### Endpoints for Room
 - GET `/rooms/` -  Get all the rooms.
 - GET `/rooms/:id/` - Get room by ID.
 - GET `/rooms/:id/members/` - Get all members of a certain room.
 - GET `/rooms/:id/channels/` - Get all the room's channels.
 - POST `/rooms/` - Creates a room.
 - PATCH - `/room/:id/` - Updates a room.
+- DELETE - `/room/:id/members/:member_id/` - Removes a room member
 
-# Endpoints for Channel
+### Endpoints for Channel
 - GET `/channels/` -  Get all the channel.
 - GET `/channels/:id/` - Get channel by ID.
 - GET `/channels/:id/members/` - Get all members of a certain channel.
