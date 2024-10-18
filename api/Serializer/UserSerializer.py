@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_password(self, data):
         password = data
         if len(password) < 6:
-            raise serializers.ValidationError("Password must be at least 6 characters long.")
+            raise serializers.ValidationError({'error': "Password must be at least of length 6."})
         return data
 
     def validate_email(self, value):
