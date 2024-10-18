@@ -1,21 +1,22 @@
 # BASE PATH: localhost:8000/api/
 
 ### Endpoints for User.
-- `/user/` - This endpoint allows creating and querying a user.
-- `/user/login/` - Login user which returns a token authentication.
-- `/user/logout/` - Logout user and delete the token associated with the user.
-
+- GET `/user/` - This endpoint allows creating and querying a user.
+- POST `/user/login/` - Login user which returns a token authentication.
+- POST `/user/logout/` - Logout user and delete the token associated with the user.
+- POST `/user/get_currently_login/` - Get user instance of currently login user.
+  
 ### Endpoints for AI model.
-- `/ai/two_venn/` - Prompt problem statement given two scopes.
-- `/ai/three_venn/` - Prompt problem statement given three scopes.
-- `/ai/potential_root/` - Prompt potential root given list of whys.
-- `/ai/five_whys/` - Prompt five whys given ranked problem statement.
-- `/ai/five_hmws/` - Prompt five whys given potential root problem.
-- `/ai/elevator_pitch/` - Prompt elevator pitch given five How Might We's
+- POST `/ai/two_venn/` - Prompt problem statement given two scopes.
+- POST `/ai/three_venn/` - Prompt problem statement given three scopes.
+- POST `/ai/potential_root/` - Prompt potential root given list of whys.
+- POST `/ai/five_whys/` - Prompt five whys given ranked problem statement.
+- POST `/ai/five_hmws/` - Prompt five whys given potential root problem.
+- POST `/ai/elevator_pitch/` - Prompt elevator pitch given five How Might We's
 
 ### Endpoints for Problem Statements
-- `/two_venn_ps/` - Saves Problem statement fron the Two Venn Diagram setting.
-- `/three_venn_ps/` - Saves Problem statement fron the Three Venn Diagram setting.
+- PUT `/two_venn_ps/` - Saves Problem statement fron the Two Venn Diagram setting.
+- PUT `/three_venn_ps/` - Saves Problem statement fron the Three Venn Diagram setting.
 
 ### Endpoints for Room
 - GET `/rooms/` -  Get all the rooms.
