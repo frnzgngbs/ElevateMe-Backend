@@ -50,9 +50,9 @@ class UserView(mixins.ListModelMixin,
         password = request.data.get('password')
 
         if not email or not password:
-            return Response({"error": "Username and password are required."})
+            return Response({"error": "Email and password are required."})
 
-        user = authenticate(username=email, password=password)
+        user = authenticate(email=email, password=password)
         print(user)
 
         if user is None:
@@ -79,7 +79,7 @@ class UserView(mixins.ListModelMixin,
 
     @action(detail=False, methods=['post'])
     def register(self, request):
-        serializer = self.get_serializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
 
         if serializer.is_valid():
             user = serializer.save()
@@ -90,6 +90,8 @@ class UserView(mixins.ListModelMixin,
                 "message": "User registered successfully.",
                 "token": token.key
             }, status=status.HTTP_201_CREATED)
+
+        print(serializer.errors)  # Add this line to see the errors in the console
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

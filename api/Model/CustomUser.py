@@ -19,7 +19,11 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True,
+    error_messages = {
+        'unique': ("An account with this email address already exists."),
+    }
+    )
     first_name = models.TextField(default='')
     last_name = models.TextField(default='')
     is_active = models.BooleanField(default=True)
