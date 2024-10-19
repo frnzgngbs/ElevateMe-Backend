@@ -17,3 +17,5 @@ class RoomChannelSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomChannel
         fields = '__all__'
+
+

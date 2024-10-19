@@ -23,6 +23,7 @@
 - GET `/rooms/:id/` - Get room by ID.
 - GET `/rooms/:id/members/` - Get all members of a certain room.
 - GET `/rooms/:id/channels/` - Get all the room's channels.
+- GET `/rooms/auth_room/` - Get currently login user's joined room
 - POST `/rooms/` - Creates a room.
 - PATCH - `/room/:id/` - Updates a room.
 - DELETE - `/room/:id/members/:member_id/` - Removes a room member

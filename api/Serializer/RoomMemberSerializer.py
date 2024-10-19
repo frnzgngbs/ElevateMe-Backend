@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomMember import RoomMember
+from api.Serializer.RoomSerializer import RoomSerializer
 
 
 class RoomMemberSerializer(serializers.ModelSerializer):
