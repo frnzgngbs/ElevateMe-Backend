@@ -15,6 +15,6 @@ router.register('rooms', RoomView)
 router.register('channels', RoomChannelView)
 
 urlpatterns = [
-    path('', include(router.urls))  # Correct usage of include
+    path('', include(router.urls)),  # Correct usage of include
 ]
 
