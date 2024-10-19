@@ -129,6 +129,9 @@ class RoomChannelView(mixins.RetrieveModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+    @action(detail=True, methods=['delete'], url_path='members/(?P<member_id>[^/.]+)')
+    def remove_channel_member(self, request, pk, member_id):
+        pass
 
 
 

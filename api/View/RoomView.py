@@ -1,7 +1,8 @@
 from django.forms import model_to_dict
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from api.Model.CustomUser import CustomUser
@@ -10,8 +11,8 @@ from api.Model.RoomChannel import RoomChannel
 from api.Model.RoomMember import RoomMember
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 from api.Serializer.RoomMemberSerializer import RoomMemberSerializer, RoomMemberDeletionSerializer
-from api.Serializer.RoomSerializer import RoomSerializer
-
+from api.Serializer.RoomSerializer import RoomSerializer, RoomJoinSerializer
+from django.db import transaction
 
 class RoomView(mixins.ListModelMixin,
                mixins.RetrieveModelMixin,
@@ -24,12 +25,15 @@ class RoomView(mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == "members":
+        if (self.action == "members" or
+            self.action == "auth_rooms"):
             return RoomMemberSerializer
         elif self.action == "channels":
             return RoomChannelSerializer
         elif self.action == "delete_room_member":
             return RoomMemberDeletionSerializer
+        elif self.action == "join":
+            return RoomJoinSerializer
         return RoomSerializer
 
     def get_object(self):
@@ -51,8 +55,6 @@ class RoomView(mixins.ListModelMixin,
         room_name = request.data.get('room_name')
 
         room_owner = CustomUser.objects.filter(email=request.user).first()
-
-        print(room_owner)
 
         room_serializer = self.get_serializer(data={"room_name": room_name, "room_owner_id": room_owner.id})
         room_serializer.is_valid(raise_exception=True)
@@ -122,8 +124,53 @@ class RoomView(mixins.ListModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['delete'], url_path='members/(?P<member_id>[^/.]+)')
-    def delete_room_member(self, request, pk, member_id):
+    def remove_room_member(self, request, pk, member_id):
         serializer = self.get_serializer(data={'room_id': pk, 'member_id': member_id})
         serializer.is_valid(raise_exception=True)
         serializer.delete()
         return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def join(self, request):
+        room_code = request.data.get('room_code')
+        member_id = request.data.get('member_id')
+
+        serializer = self.get_serializer(data={"room_code": room_code, "member_id": member_id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['get'])
+    def auth_rooms(self, request):
+        user = request.user
+        room_members = RoomMember.objects.filter(member_id=user.id)
+
+        serializer = RoomMemberSerializer(room_members, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    # def destroy(self, request, *args, **kwargs):
+    #     print(kwargs.get('pk'))
+    #
+    #     room_id = kwargs.get('pk')
+    #
+    #     """
+    #         STEP 1: Get rooms
+    #         STEP 2: Get Channel
+    #         STEP 3: Get Channel Members and Delete
+    #         STEP 4: Delete Channels
+    #         STEP 5: Delete Room
+    #     """
+    #
+    #     try:
+    #         with transaction.atomic():
+    #             room = self.get_queryset().get(id=room_id)
+    #
+    #
+    #     except Room.DoesNotExist:
+    #         raise ValidationError({"error": f"Room with id {room_id} does not exist"})
+    #
+    #     return None
+
