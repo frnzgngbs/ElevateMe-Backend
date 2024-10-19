@@ -4,7 +4,6 @@ from rest_framework.exceptions import ValidationError
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomMember import RoomMember
-from api.Serializer.RoomMemberSerializer import RoomMemberSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -14,7 +13,6 @@ class RoomSerializer(serializers.ModelSerializer):
         required=False
     )
 
-    room_members = RoomMemberSerializer(source='roommember_set', many=True, read_only=True)
     class Meta:
         model = Room
         fields = '__all__'

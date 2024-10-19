@@ -1,7 +1,6 @@
 from django.forms import model_to_dict
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
@@ -12,7 +11,6 @@ from api.Model.RoomMember import RoomMember
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 from api.Serializer.RoomMemberSerializer import RoomMemberSerializer, RoomMemberDeletionSerializer
 from api.Serializer.RoomSerializer import RoomSerializer, RoomJoinSerializer
-from django.db import transaction
 
 class RoomView(mixins.ListModelMixin,
                mixins.RetrieveModelMixin,
@@ -23,7 +21,6 @@ class RoomView(mixins.ListModelMixin,
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     permission_classes = [IsAuthenticated]
-
     def get_serializer_class(self):
         if (self.action == "members" or
             self.action == "auth_rooms"):
@@ -35,7 +32,6 @@ class RoomView(mixins.ListModelMixin,
         elif self.action == "join":
             return RoomJoinSerializer
         return RoomSerializer
-
     def get_object(self):
         if self.action == "members":
             room = super().get_object()
@@ -60,6 +56,7 @@ class RoomView(mixins.ListModelMixin,
         room_serializer.is_valid(raise_exception=True)
 
         users = []
+        users.append(room_owner)
         for email in members_data:
             try:
                 user = CustomUser.objects.get(email=email)
@@ -144,11 +141,21 @@ class RoomView(mixins.ListModelMixin,
     @action(detail=False, methods=['get'])
     def auth_rooms(self, request):
         user = request.user
+
         room_members = RoomMember.objects.filter(member_id=user.id)
 
-        serializer = RoomMemberSerializer(room_members, many=True)
+        room_member_serializer = RoomMemberSerializer(room_members, many=True)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        room_ids = set()
+
+        for room_member in room_member_serializer.data:
+            room_ids.add(room_member['room_id'])
+
+        rooms = Room.objects.filter(id__in=room_ids)
+
+        room_serializer = RoomSerializer(rooms, many=True)
+
+        return Response(room_serializer.data, status=status.HTTP_200_OK)
 
 
     # def destroy(self, request, *args, **kwargs):
