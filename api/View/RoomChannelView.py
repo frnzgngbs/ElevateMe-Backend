@@ -10,6 +10,7 @@ from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
 from api.Serializer.ChannelMemberSerializer import ChannelMemberSerializer, ChannelMemberDeletionSerializer
+from api.Serializer.ChannelSubmissionSerializer import ChannelSubmissionSerializer
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 
 
@@ -20,7 +21,7 @@ class RoomChannelView(mixins.RetrieveModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
     queryset = RoomChannel.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = RoomChannelSerializer
 
 
@@ -39,6 +40,8 @@ class RoomChannelView(mixins.RetrieveModelMixin,
             return ChannelMemberSerializer
         if self.action == "remove_channel_member":
             return ChannelMemberDeletionSerializer
+        if self.action == "submit":
+            return ChannelSubmissionSerializer
         return RoomChannelSerializer
 
 
@@ -127,7 +130,5 @@ class RoomChannelView(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.delete()
         return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
-
-
 
 

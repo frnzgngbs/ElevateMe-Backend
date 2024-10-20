@@ -35,3 +35,8 @@
 - POST `/channels/` - Creates a channel.
 - PATCH - `/channels/:id/` - Updates a channel.
 - DELETE - `/channels/:id/members/:member_id/` - Removes a channel member
+
+### Endpoints for Channel Submission
+- GET `/channels/:id/submissions/` -  Get all the channel.
+- GET `/channels/:id/submissions/:channel_pk/` -  Get submission from a specific channel.
+- POST `/channels/:id/submissions/submit/` - Creates a channel.

@@ -5,8 +5,6 @@ from api.Serializer.ChannelMemberSerializer import ChannelMemberSerializer
 
 
 class RoomChannelSerializer(serializers.ModelSerializer):
-    channel_members = ChannelMemberSerializer(source='channelmember_set', many=True, read_only=True)
-
     new_channel_member_emails = serializers.ListField(
         child=serializers.EmailField(),
         required=False,
