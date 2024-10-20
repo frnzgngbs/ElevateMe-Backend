@@ -34,3 +34,4 @@
 - GET `/channels/:id/members/` - Get all members of a certain channel.
 - POST `/channels/` - Creates a channel.
 - PATCH - `/channels/:id/` - Updates a channel.
+- DELETE - `/channels/:id/members/:member_id/` - Removes a channel member
