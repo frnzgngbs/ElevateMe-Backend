@@ -30,10 +30,10 @@ class RoomMemberDeletionSerializer(serializers.Serializer):
         member_id = attrs.get('member_id')
 
         if not Room.objects.filter(id=room_id).exists():
-            raise ValidationError(f'Room with id: {room_id} does not exists')
+            raise ValidationError(f'Room with room_id: {room_id} does not exists')
 
         if not CustomUser.objects.filter(id=member_id).exists():
-            raise ValidationError(f'Room with id: {room_id} does not exists')
+            raise ValidationError(f'Member with member_id: {member_id} does not exists')
 
         if not RoomMember.objects.filter(room_id=room_id, member_id=member_id).exists():
             raise ValidationError(f'Member with member_id {member_id} is not a member of room with room_id {room_id}')
