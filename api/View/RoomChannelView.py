@@ -9,7 +9,7 @@ from api.Model.ChannelMember import ChannelMember
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
-from api.Serializer.ChannelMemberSerializer import ChannelMemberSerializer
+from api.Serializer.ChannelMemberSerializer import ChannelMemberSerializer, ChannelMemberDeletionSerializer
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 
 
@@ -37,6 +37,8 @@ class RoomChannelView(mixins.RetrieveModelMixin,
     def get_serializer_class(self):
         if self.action == "members":
             return ChannelMemberSerializer
+        if self.action == "remove_channel_member":
+            return ChannelMemberDeletionSerializer
         return RoomChannelSerializer
 
 
@@ -92,27 +94,17 @@ class RoomChannelView(mixins.RetrieveModelMixin,
         except Room.DoesNotExist:
             raise ValidationError(f"Room with ID: {room_id} does not exist")
 
-
-        print(model_to_dict(channel))
-        print(members_to_be_added)
-
         for member_email in members_to_be_added:
-            to_be_added = CustomUser.objects.get(email=member_email)
-
             try:
                 to_be_added = CustomUser.objects.get(email=member_email)
             except CustomUser.DoesNotExist:
                 raise ValidationError(f"User with email: {member_email} does not exist")
-
-            print(model_to_dict(to_be_added))
 
             channel_member_data = {
                 "room_id": room.id,
                 "member_id": to_be_added.id,
                 "channel_id": channel.id
             }
-
-            print(channel_member_data)
 
             channel_member_serializer = ChannelMemberSerializer(data=channel_member_data)
             channel_member_serializer.is_valid(raise_exception=True)
@@ -131,7 +123,10 @@ class RoomChannelView(mixins.RetrieveModelMixin,
 
     @action(detail=True, methods=['delete'], url_path='members/(?P<member_id>[^/.]+)')
     def remove_channel_member(self, request, pk, member_id):
-        pass
+        serializer = self.get_serializer(data={'channel_id': pk, 'member_id': member_id})
+        serializer.is_valid(raise_exception=True)
+        serializer.delete()
+        return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
 
 
 
