@@ -37,9 +37,9 @@
 - DELETE - `/channels/:id/members/:member_id/` - Removes a channel member
 
 ### Endpoints for Channel Submission
-- GET `/channels/:id/submissions/` -  Get all the channel.
+- GET `/channels/:id/submissions/` -  Get all the channels' submission.
 - GET `/channels/:id/submissions/:channel_pk/` -  Get submission from a specific channel. 
-- POST `/channels/:id/submissions/submit/` - Creates a channel.
+- POST `/channels/:id/submissions/submit/` - Creates a submission
 
 ### Endpoints for Comments
 - GET `/channels/:id/submissions/:id/comments/` - Get submission comments
