@@ -63,7 +63,8 @@ class RoomChannelView(mixins.RetrieveModelMixin,
         channel_serializer = self.get_serializer(data={"channel_name": channel_name, "room_id": room.id })
         channel_serializer.is_valid(raise_exception=True)
 
-        members = []
+        user = request.user
+        members = [user]
 
         for email in channel_members:
             try:

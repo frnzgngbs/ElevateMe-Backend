@@ -38,5 +38,9 @@
 
 ### Endpoints for Channel Submission
 - GET `/channels/:id/submissions/` -  Get all the channel.
-- GET `/channels/:id/submissions/:channel_pk/` -  Get submission from a specific channel.
+- GET `/channels/:id/submissions/:channel_pk/` -  Get submission from a specific channel. 
 - POST `/channels/:id/submissions/submit/` - Creates a channel.
+
+### Endpoints for Comments
+- GET `/channels/:id/submissions/:id/comments/` - Get submission comments
+- POST `/channels/:id/submissions/:id/comments` - Creates a submission comment
