@@ -27,7 +27,7 @@ class RoomView(mixins.ListModelMixin,
             return RoomMemberSerializer
         elif self.action == "channels":
             return RoomChannelSerializer
-        elif self.action == "delete_room_member":
+        elif self.action == "remove_room_member":
             return RoomMemberDeletionSerializer
         elif self.action == "join":
             return RoomJoinSerializer
