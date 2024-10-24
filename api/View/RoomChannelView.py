@@ -131,5 +131,3 @@ class RoomChannelView(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.delete()
         return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
-
-

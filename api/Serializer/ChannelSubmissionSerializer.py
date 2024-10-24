@@ -5,29 +5,48 @@ from api.Model.ChannelSubmission import ChannelSubmission
 from api.Model.CustomUser import CustomUser
 from api.Model.RoomChannel import RoomChannel
 
+
 class ChannelSubmissionSerializer(serializers.ModelSerializer):
+    member_name = serializers.SerializerMethodField()  # Renamed from member_id to avoid confusion
+
     class Meta:
         model = ChannelSubmission
         fields = '__all__'
 
+    def get_member_name(self, obj):  # Renamed from get_member_id
+        return f"{obj.member_id.first_name} {obj.member_id.last_name}"
+
     def validate(self, attrs):
-        channel = attrs.get('channel_id')
-        member = attrs.get('member_id')
+        channel_id = attrs.get('channel_id')
+        member_id = attrs.get('member_id')
+
+        if not channel_id or not member_id:
+            raise serializers.ValidationError({
+                "non_field_errors": "Both channel_id and member_id are required"
+            })
 
         try:
-            channel = RoomChannel.objects.get(id=channel.id)
+            channel = RoomChannel.objects.get(id=channel_id.id)
         except RoomChannel.DoesNotExist:
-            raise ValidationError(f"Channel with channel_id: {channel.id} does not exist")
+            raise serializers.ValidationError({
+                "channel_id": f"Channel with id {channel_id.id} does not exist"
+            })
 
         try:
-            member = CustomUser.objects.get(id=member.id)
+            member = CustomUser.objects.get(id=member_id.id)
         except CustomUser.DoesNotExist:
-            raise ValidationError(f"User with member_id: {member.id} does not exist")
+            raise serializers.ValidationError({
+                "member_id": f"User with id {member_id.id} does not exist"
+            })
 
         if not ChannelMember.objects.filter(member_id=member.id, channel_id=channel.id).exists():
-            raise ValidationError(f"Member with member_id: {member.id} does not exist in channel with channel_id: {channel.id}")
+            raise serializers.ValidationError({
+                "non_field_errors": f"Member with id {member.id} does not exist in channel with id {channel.id}"
+            })
 
         if ChannelSubmission.objects.filter(channel_id=channel.id, member_id=member.id).exists():
-            raise ValidationError(f"Member with member_id: {member.id} has already submitted in channel with channel_id: {channel.id}")
+            raise serializers.ValidationError({
+                "non_field_errors": f"Member with id {member.id} has already submitted in channel with id {channel.id}"
+            })
 
         return attrs

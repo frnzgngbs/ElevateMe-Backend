@@ -144,6 +144,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'api.CustomUser'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# URL that handles the media served from MEDIA_ROOT
+MEDIA_URL = '/media/'
 
 load_dotenv()
 

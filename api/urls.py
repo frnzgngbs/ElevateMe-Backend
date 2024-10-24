@@ -1,3 +1,5 @@
+from aiohttp.web_routedef import static
+from django.conf import settings
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from rest_framework_nested import routers
