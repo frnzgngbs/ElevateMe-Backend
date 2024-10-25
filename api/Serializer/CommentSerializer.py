@@ -7,9 +7,15 @@ from api.Model.SubmissionComment import SubmissionComment
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author_full_name = serializers.SerializerMethodField()
+    content = serializers.CharField()
+    commented_on = serializers.DateTimeField(read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'
+
+    def get_author_full_name(self, obj):
+        return f"{obj.author.first_name} {obj.author.last_name}"
 
     def create(self, validated_data):
         submission = validated_data.get('submission_id')

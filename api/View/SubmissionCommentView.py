@@ -18,23 +18,20 @@ class SubmissionCommentView(mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
 
-    def get_serializer_class(self):
-        if self.action == "list":
-            return SubmissionCommentSerializer
-        return self.serializer_class
-
     def get_queryset(self):
         submission_id = self.kwargs['submission_pk']
-        return SubmissionComment.objects.filter(comment_id__submission_id=submission_id)
-
+        # Return comments associated with the given submission_id
+        return Comment.objects.filter(submission_id=submission_id)
 
     def create(self, request, *args, **kwargs):
         submission_id = kwargs.get('submission_pk')
         content = request.data.get('content')
+        author = request.user  # Get the logged-in user
 
         serializer = self.get_serializer(data={
             "content": content,
             "submission_id": submission_id,
+            "author": author.id
         })
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -43,5 +40,6 @@ class SubmissionCommentView(mixins.ListModelMixin,
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = SubmissionCommentSerializer(queryset, many=True)
+        serializer = self.get_serializer(queryset, many=True)  # Use CommentSerializer here
         return Response(serializer.data, status=status.HTTP_200_OK)
+
