@@ -19,6 +19,8 @@ class ChannelSubmissionView(mixins.ListModelMixin,
     queryset = ChannelSubmission.objects.all()
     permission_classes = [IsAuthenticated]
 
+
+
     def get_queryset(self):
         return ChannelSubmission.objects.filter(channel_id=self.kwargs['channel_pk'])
 
@@ -27,19 +29,28 @@ class ChannelSubmissionView(mixins.ListModelMixin,
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-
     @action(detail=False, methods=['post'])
     def submit(self, request, channel_pk=None):
-        submitted_work = request.data.get('submitted_work')
+        try:
+            channel = RoomChannel.objects.get(id=channel_pk)
+        except RoomChannel.DoesNotExist:
+            return Response(
+                {"error": f"Channel with id {channel_pk} does not exist"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        submitted_work = request.FILES.get('submitted_work')
+        problem_statement = request.data.get('problem_statement')
         user_submitted = request.user
 
         serializer = self.get_serializer(data={
             "submitted_work": submitted_work,
             "member_id": user_submitted.id,
-            "channel_id": channel_pk
+            "channel_id": channel.id,  # Pass the channel object or its ID
+            "problem_statement": problem_statement
         })
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
