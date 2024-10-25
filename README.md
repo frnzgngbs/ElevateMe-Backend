@@ -43,4 +43,10 @@
 
 ### Endpoints for Comments
 - GET `/channels/:id/submissions/:id/comments/` - Get submission comments
+- GET `/channels/:id/submissions/:id/comments/:id/` - Get specific submission comments
 - POST `/channels/:id/submissions/:id/comments` - Creates a submission comment
+
+### Endpoints for Submission Voting Marks
+- GET `/channels/:id/submissions/:id/voting_marks/` - Get submission voting marks.
+- GET `/channels/:id/submissions/:id/voting_marks/:id/` - Get specific submission voting marks.
+- POST `/channels/:id/submissions/:id/voting_marks/` - Creates a submission voting marks.
