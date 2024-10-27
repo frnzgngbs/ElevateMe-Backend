@@ -4,7 +4,7 @@ from api.Model.RoomChannel import RoomChannel
 from api.Model.CustomUser import CustomUser
 
 class ChannelSubmission(models.Model):
-    submitted_work = models.FileField()  # TextField for now
+    submitted_work = models.FileField(blank=True)  # TextField for now
     problem_statement = models.TextField(blank=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
     member_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Kinsa na user ang ni submit
