@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from api.Model.ChannelMember import ChannelMember
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
@@ -112,20 +113,41 @@ class RoomView(mixins.ListModelMixin,
 
     @action(detail=True, methods=['get'])
     def channels(self, request, pk):
-        room = self.get_object()
+        user = request.user
 
-        channels = RoomChannel.objects.filter(room_id=room.id)
+        channels = RoomChannel.objects.filter(
+            room_id=pk,
+            channelmember__member_id=user.id
+        ).distinct()
 
         serializer = self.get_serializer(channels, many=True)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['delete'], url_path='members/(?P<member_id>[^/.]+)')
     def remove_room_member(self, request, pk, member_id):
         serializer = self.get_serializer(data={'room_id': pk, 'member_id': member_id})
         serializer.is_valid(raise_exception=True)
-        serializer.delete()
-        return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
+
+        try:
+            room_channels = RoomChannel.objects.filter(room_id=pk)
+
+            ChannelMember.objects.filter(
+                channel_id__in=room_channels,
+                member_id=member_id
+            ).delete()
+
+            serializer.delete()
+
+            return Response(
+                {"message": "Member removed from room and all associated channels"},
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to remove member: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=False, methods=['post'])
     def join(self, request):
