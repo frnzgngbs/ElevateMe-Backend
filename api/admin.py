@@ -9,6 +9,7 @@ from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
 from api.Model.RoomMember import RoomMember
 from api.Model.Comment import Comment
+from api.Model.RoomRequestJoin import RoomRequestJoin
 from api.Model.SubmissionVoting import SubmissionVotingMark
 from api.Model.VennDiagram import TwoVennDiagramModel, ThreeVennDiagramModel
 
@@ -24,3 +25,4 @@ admin.site.register(Comment)
 admin.site.register(TwoVennDiagramModel)
 admin.site.register(ThreeVennDiagramModel)
 admin.site.register(SubmissionVotingMark)
+admin.site.register(RoomRequestJoin)

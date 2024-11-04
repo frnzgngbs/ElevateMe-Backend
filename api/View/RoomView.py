@@ -9,8 +9,10 @@ from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
 from api.Model.RoomMember import RoomMember
+from api.Model.RoomRequestJoin import RoomRequestJoin
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 from api.Serializer.RoomMemberSerializer import RoomMemberSerializer, RoomMemberDeletionSerializer
+from api.Serializer.RoomRequestJoinSerializer import RoomRequestJoinSerializer
 from api.Serializer.RoomSerializer import RoomSerializer, RoomJoinSerializer
 
 class RoomView(mixins.ListModelMixin,
@@ -32,13 +34,14 @@ class RoomView(mixins.ListModelMixin,
             return RoomMemberDeletionSerializer
         elif self.action == "join":
             return RoomJoinSerializer
+        elif self.action == "get_applicants":
+            return RoomRequestJoinSerializer
         return RoomSerializer
-    def get_object(self):
-        if self.action == "members":
-            room = super().get_object()
-            return RoomMember.objects.filter(room_id=room.id)
-        else:
-            return super().get_object()
+    def get_room_members(self, room):
+        return RoomMember.objects.filter(room_id=room.id)
+
+    def get_room_applicants(self, room):
+        return RoomRequestJoin.objects.filter(room_id=room.id)
 
     def create(self, request, *args, **kwargs):
         """
@@ -105,11 +108,10 @@ class RoomView(mixins.ListModelMixin,
 
     @action(detail=True, methods=['get'])
     def members(self, request, pk):
-        room_members = self.get_object()
-        if request.method == "GET":
-            serializer = self.get_serializer(room_members, many=True)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        room = self.get_object()
+        room_members = self.get_room_members(room)
+        serializer = RoomMemberSerializer(room_members, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def channels(self, request, pk):
@@ -152,13 +154,95 @@ class RoomView(mixins.ListModelMixin,
     @action(detail=False, methods=['post'])
     def join(self, request):
         room_code = request.data.get('room_code')
-        member_id = request.data.get('member_id')
+        member_id = request.user
 
-        serializer = self.get_serializer(data={"room_code": room_code, "member_id": member_id})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # Validate room and user existence
+        try:
+            room = Room.objects.get(room_code=room_code)
+            user = CustomUser.objects.get(id=member_id.id)
+        except Room.DoesNotExist:
+            return Response({"error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if RoomRequestJoin.can_create_request(user=user, room=room):
+            join_request = RoomRequestJoin.objects.create(
+                user=user,
+                room=room,
+                status='pending'
+            )
+            return Response(
+                {"message": "Join request created successfully.", "request_id": join_request.id},
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                {"error": "You already have an active or approved request for this room."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+    @action(detail=True, methods=['post'])
+    def manage_request(self, request, pk=None):
+        action_type = request.data.get('action')
+        request_id = request.data.get('request_id')
+
+        if not action_type:
+            return Response(
+                {"error": "Action type is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            join_request = RoomRequestJoin.objects.get(
+                id=request_id,
+                room_id=pk,
+                status='pending'
+            )
+        except RoomRequestJoin.DoesNotExist:
+            return Response(
+                {"error": "Active join request not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+        user = CustomUser.objects.filter(id=join_request.user_id).first()
+
+        if not user:
+            raise ValidationError("User not found.")
+
+        if action_type == "accept":
+            join_request.status = 'approved'
+            join_request.save()
+
+            RoomMember.objects.create(
+                room_id_id=pk,
+                member_id=user
+            )
+
+            return Response(
+                {"message": "Join request approved and member added."},
+                status=status.HTTP_200_OK
+            )
+
+        elif action_type == "reject":
+            join_request.status = 'rejected'
+            join_request.save()
+            return Response(
+                {"message": "Join request rejected."},
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            {"error": f"Action '{action_type}' is not supported."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    @action(detail=True, methods=['get'])
+    def applicants(self, request, pk):
+        room = self.get_object()
+        room_members = self.get_room_applicants(room)
+        serializer = RoomRequestJoinSerializer(room_members, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def auth_rooms(self, request):

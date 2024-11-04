@@ -44,7 +44,8 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "Your tasked is to understand what the user's want."},
+                     "content": SYSTEM_PROMPTS.get('two_venn')
+                     },
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -77,7 +78,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "Your tasked is to understand what the user's want."},
+                     "content": SYSTEM_PROMPTS.get('three_venn')},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -148,7 +149,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."},
+                     "content": SYSTEM_PROMPTS.get('five_whys')},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -175,7 +176,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "PLEASE READ THE USERS PROMPT AND DO WHAT IT IS SAYING."
+                     "content": SYSTEM_PROMPTS.get('five_hmws'),
                      },
                     {"role": "user", "content": prompt}
                 ]
@@ -233,7 +234,7 @@ class GPTApiView(viewsets.GenericViewSet):
             model="gpt-4o-mini",
             messages=[
                 {"role": "system",
-                 "content": "Strictly follow what the user want and do not ignore even a small detail on the user's prompt."
+                 "content": SYSTEM_PROMPTS.get('elevator_pitch'),
                  },
                 {"role": "user", "content": prompt}
             ]
@@ -267,3 +268,52 @@ def two_prompt(**kwargs):
         return f"Generate 5 pr oblem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}. Strictly give the problem statement directly, not solutions."
     else:
         return f"Generate 5 problem statements given these scopes: {kwargs.get('field1')}, {kwargs.get('field2')}.  Take note of this  specification {kwargs.get('filter')}. Strictly give the problem statement directly, not solutions."
+
+SYSTEM_PROMPTS = {
+    'two_venn': """
+        You are a precise problem statement generator. Your responses must:
+        1. Generate exactly 5 problem statements
+        2. Each statement must be clear and actionable
+        3. Statements must relate to BOTH provided fields
+        4. Never provide a response that is a solution or suggestions
+        5. Return only the numbered statements, nothing else
+    """,
+
+    'three_venn': """
+        You are a precise problem statement generator. Your responses must:
+        1. Generate exactly 5 problem statements
+        2. Each statement must relate to ALL THREE provided fields
+        3. Statements must be clear and actionable
+        4. Never provide a response that is a solution or suggestions
+        5. Return only the numbered statements, nothing else
+    """,
+
+    'five_whys': """
+        You are a root cause analyzer. Your responses must:
+        1. Generate exactly 5 'why' questions
+        2. Each question must directly follow from the previous one
+        3. Questions must dig deeper into the root cause
+        4. Format as '1. Why ...?', '2. Why ...?', etc.
+        5. No explanations or additional text
+    """,
+
+    'five_hmws': """
+        You are a solution framework generator. Your responses must:
+        1. Generate exactly 5 'How Might We' statements
+        2. Each statement must be actionable and specific
+        3. Statements must directly relate to the root problem
+        4. Format as 'How might we ...'
+        5. No additional commentary or explanations
+    """,
+
+    'elevator_pitch': """
+        You are a precise elevator pitch generator. Your response must:
+        1. Follow the exact format provided
+        2. Each section must be concise and specific
+        3. All sections must align with the provided context
+        4. No additional formatting or explanations
+        5. Each response must start with the exact keywords provided
+    """
+}
+
+
