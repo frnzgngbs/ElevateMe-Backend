@@ -24,8 +24,11 @@
 - GET `/rooms/:id/members/` - Get all members of a certain room.
 - GET `/rooms/:id/channels/` - Get all the room's channels.
 - GET `/rooms/auth_room/` - Get currently login user's joined room
+- GET `/rooms/:id/applicants/` - Get all rooms applicants.
 - POST `/rooms/` - Creates a room.
 - PATCH - `/room/:id/` - Updates a room.
+- POST `/rooms/:id/join/` - Request to join a room.
+- POST `/rooms/:id/manage_request/` - Manage request application of a room.
 - DELETE - `/room/:id/members/:member_id/` - Removes a room member
 
 ### Endpoints for Channel
