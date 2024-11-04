@@ -53,7 +53,6 @@ class RoomChannelView(mixins.RetrieveModelMixin,
             return super().get_object()
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
         channel_members = request.data.get('channel_members', [])
         channel_name = request.data.get('channel_name')
         room_id = request.data.get('room_id')

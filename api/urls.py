@@ -39,6 +39,7 @@ comment_router = routers.NestedSimpleRouter(
     r'submissions',
     lookup='submission'
 )
+
 comment_router.register(
     r'comments',
     SubmissionCommentView,

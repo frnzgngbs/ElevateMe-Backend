@@ -6,11 +6,11 @@ from api.Serializer.SubmissionVotingSerializer import SubmissionVotingMarkSerial
 
 
 class SubmissionVotingMarkView(mixins.CreateModelMixin,
-                           mixins.ListModelMixin,
-                           mixins.RetrieveModelMixin,
-                           mixins.UpdateModelMixin,
-                           mixins.DestroyModelMixin,
-                           viewsets.GenericViewSet):
+                               mixins.ListModelMixin,
+                               mixins.RetrieveModelMixin,
+                               mixins.UpdateModelMixin,
+                               mixins.DestroyModelMixin,
+                               viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SubmissionVotingMarkSerializer
 
