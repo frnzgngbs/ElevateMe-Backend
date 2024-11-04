@@ -7,13 +7,14 @@ from api.Model.RoomChannel import RoomChannel
 
 
 class ChannelSubmissionSerializer(serializers.ModelSerializer):
-    member_name = serializers.SerializerMethodField()  # Renamed from member_id to avoid confusion
+    member_name = serializers.SerializerMethodField
 
     class Meta:
         model = ChannelSubmission
         fields = '__all__'
+        read_only_fields = ['date_submitted']
 
-    def get_member_name(self, obj):  # Renamed from get_member_id
+    def get_member_name(self, obj):
         return f"{obj.member_id.first_name} {obj.member_id.last_name}"
 
     def validate(self, attrs):
