@@ -151,8 +151,8 @@ class RoomView(mixins.ListModelMixin,
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=['post'])
-    def join(self, request, pk):
+    @action(detail=False, methods=['post'])
+    def join(self, request):
         room_code = request.data.get('room_code')
         member_id = request.user
 
