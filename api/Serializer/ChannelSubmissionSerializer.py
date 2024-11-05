@@ -7,7 +7,7 @@ from api.Model.RoomChannel import RoomChannel
 
 
 class ChannelSubmissionSerializer(serializers.ModelSerializer):
-    member_name = serializers.SerializerMethodField
+    member_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ChannelSubmission
