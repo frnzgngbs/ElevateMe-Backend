@@ -140,6 +140,8 @@ class RoomView(mixins.ListModelMixin,
 
             RoomRequestJoin.objects.filter(room_id=pk, user_id=member_id).update(status='removed')
 
+            serializer.delete()
+
             return Response(
                 {"message": "Member removed from room and all associated channels"},
                 status=status.HTTP_200_OK
