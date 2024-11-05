@@ -41,7 +41,7 @@ class RoomView(mixins.ListModelMixin,
         return RoomMember.objects.filter(room_id=room.id)
 
     def get_room_applicants(self, room):
-        return RoomRequestJoin.objects.filter(room_id=room.id)
+        return RoomRequestJoin.objects.filter(status='pending', room_id=room.id)
 
     def create(self, request, *args, **kwargs):
         """
@@ -138,7 +138,7 @@ class RoomView(mixins.ListModelMixin,
                 member_id=member_id
             ).delete()
 
-            serializer.delete()
+            RoomRequestJoin.objects.filter(room_id=pk, user_id=member_id).update(status='removed')
 
             return Response(
                 {"message": "Member removed from room and all associated channels"},
@@ -151,12 +151,11 @@ class RoomView(mixins.ListModelMixin,
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=False, methods=['post'])
-    def join(self, request):
+    @action(detail=True, methods=['post'])
+    def join(self, request, pk):
         room_code = request.data.get('room_code')
         member_id = request.user
 
-        # Validate room and user existence
         try:
             room = Room.objects.get(room_code=room_code)
             user = CustomUser.objects.get(id=member_id.id)
