@@ -20,7 +20,7 @@ class ChannelSubmissionView(mixins.ListModelMixin,
                             mixins.DestroyModelMixin,
                             viewsets.GenericViewSet):
     serializer_class = ChannelSubmissionSerializer
-    queryset = ChannelSubmission.objects.all()
+    queryset = ChannelSubmission.objects.all
     parser_classes = (MultiPartParser, FormParser)  # Add this line if not already present
     permission_classes = [IsAuthenticated]
 
