@@ -8,6 +8,7 @@ class RoomRequestJoin(models.Model):
             request_timestamp - What date did he requested to join
         }
     """
+
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
