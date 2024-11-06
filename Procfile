@@ -1,2 +1,2 @@
-web: gunicorn ElevateMe
+web: gunicorn ElevateMe:application
 
