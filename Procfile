@@ -1,2 +1,1 @@
-web: gunicorn ElevateMe:application
-
+web: gunicorn ElevateMe.wsgi:application
