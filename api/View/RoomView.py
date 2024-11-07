@@ -41,7 +41,7 @@ class RoomView(mixins.ListModelMixin,
         return RoomMember.objects.filter(room_id=room.id)
 
     def get_room_applicants(self, room):
-        return RoomRequestJoin.objects.filter(room_id=room.id)
+        return RoomRequestJoin.objects.filter(status='pending', room_id=room.id)
 
     def create(self, request, *args, **kwargs):
         """
@@ -137,6 +137,8 @@ class RoomView(mixins.ListModelMixin,
                 channel_id__in=room_channels,
                 member_id=member_id
             ).delete()
+
+            RoomRequestJoin.objects.filter(room_id=pk, user_id=member_id).update(status='removed')
 
             serializer.delete()
 
