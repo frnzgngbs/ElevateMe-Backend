@@ -115,7 +115,7 @@ class GPTApiView(viewsets.GenericViewSet):
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": "Your tasked is to understand what the user's want."},
+                     "content": SYSTEM_PROMPTS.get('five_whys')},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -142,14 +142,14 @@ class GPTApiView(viewsets.GenericViewSet):
             prompt = (
                 f"Generate one potential root problem to uncover the underlying issue behind these set of why's statement: {joined_whys}. "
                 f"And and this problem statement: {request.data.get('selected_statement')}."
-                "I want you uncover potential issues based on the context given. Take note, I am only asking for a one potential root problem. Do not put any indicator that it is the potential root problem as I know that the responses are all potential root problem."
+                "I want you uncover potential issues based on the context given."
             )
 
             response = openai.ChatCompletion.create(
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system",
-                     "content": SYSTEM_PROMPTS.get('five_whys')},
+                     "content": SYSTEM_PROMPTS.get('potential_root')},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -171,6 +171,8 @@ class GPTApiView(viewsets.GenericViewSet):
             prompt = (
                 f"Based on these contexts: {root_problem}, the first problem statement: {selected_statement}, and a set of whys statement: {list_of_whys}. Only generate five how might we statements and do not include any unnecessary things."
             )
+
+            print(type(prompt))
 
             response = openai.ChatCompletion.create(
                 model="gpt-4o-mini",
@@ -271,30 +273,31 @@ def two_prompt(**kwargs):
 
 SYSTEM_PROMPTS = {
     'two_venn': """
-        You are a precise problem statement generator. Your responses must:
-        1. Generate exactly 5 problem statements
-        2. Each statement must be clear and actionable
-        3. Statements must relate to BOTH provided fields
-        4. Never provide a response that is a solution or suggestions
-        5. Return only the numbered statements, nothing else
+        You are a precise problem statement NOT solution generator. Your responses must:
+        1. Generate exactly only 5 problem statements, not solution!
+        2. Statements must relate to BOTH provided fields
     """,
 
     'three_venn': """
-        You are a precise problem statement generator. Your responses must:
-        1. Generate exactly 5 problem statements
-        2. Each statement must relate to ALL THREE provided fields
-        3. Statements must be clear and actionable
-        4. Never provide a response that is a solution or suggestions
-        5. Return only the numbered statements, nothing else
+        You are a precise problem statement NOT solution generator. Your responses must:
+        1. Generate exactly only 5 problem statements, not solution!
+        2. Statements must relate to BOTH provided fields
     """,
 
     'five_whys': """
-        You are a root cause analyzer. Your responses must:
+        You are a problem statement analyzer. Your responses must:
         1. Generate exactly 5 'why' questions
         2. Each question must directly follow from the previous one
         3. Questions must dig deeper into the root cause
         4. Format as '1. Why ...?', '2. Why ...?', etc.
-        5. No explanations or additional text
+        5. No more explanations just the root cause directy.
+    """,
+
+    'potential_root': """
+        As a root problem analyzer, your task is to:
+        - **Identify and directly state one clear potential root problem** based on the user’s input, without introductory phrases or additional context.
+        - Avoid any numbering, introductory words, or extra explanations—simply provide the potential root problem in a straightforward, concise format.
+        - Ensure the analysis is highly relevant to the specific context or details provided in the user’s prompt, focusing on the core underlying issue.
     """,
 
     'five_hmws': """
@@ -302,17 +305,22 @@ SYSTEM_PROMPTS = {
         1. Generate exactly 5 'How Might We' statements
         2. Each statement must be actionable and specific
         3. Statements must directly relate to the root problem
-        4. Format as 'How might we ...'
+        4. Format as '1. How might we ...' '2. How might we ...', etc.
         5. No additional commentary or explanations
     """,
 
     'elevator_pitch': """
         You are a precise elevator pitch generator. Your response must:
-        1. Follow the exact format provided
-        2. Each section must be concise and specific
-        3. All sections must align with the provided context
-        4. No additional formatting or explanations
-        5. Each response must start with the exact keywords provided
+        "Generate an elevator pitch by strictly following this format:\n"
+        "FOR: [the target consumer]\n"
+        "WHO: [specific needs, requirements, demands, or criteria],\n"
+        "WE PROVIDE: [solution or description],\n"
+        "THAT: [specific benefits or value to clients],\n"
+        "UNLIKE: [the competition],\n"
+        "WHO: [provide a solution, features, functions, or benefits],\n"
+        "OUR SOLUTION: [better approach, solution, features, benefits, or technology],\n"
+        "THAT: [offers a better customer experience].\n"
+        "Please ensure that you only fill in the capitalized sections with appropriate details and follow the structure exactly as outlined."
     """
 }
 
