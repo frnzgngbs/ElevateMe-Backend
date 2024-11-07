@@ -12,7 +12,8 @@ class RoomRequestJoin(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
-        ('rejected', 'Rejected')
+        ('rejected', 'Rejected'),
+        ('removed', 'Removed')
     ]
 
     date_requested = models.DateTimeField(auto_now_add=True)
