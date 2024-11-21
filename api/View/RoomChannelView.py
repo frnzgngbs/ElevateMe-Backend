@@ -2,13 +2,15 @@ from django.forms import model_to_dict
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
 from rest_framework.response import Response
 
 from api.Model.ChannelMember import ChannelMember
+from api.Model.ChannelSubmission import ChannelSubmission
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
+from api.Model.SubmissionVoting import SubmissionVotingMark
 from api.Serializer.ChannelMemberSerializer import ChannelMemberSerializer, ChannelMemberDeletionSerializer
 from api.Serializer.ChannelSubmissionSerializer import ChannelSubmissionSerializer
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
@@ -45,12 +47,19 @@ class RoomChannelView(mixins.RetrieveModelMixin,
         return RoomChannelSerializer
 
 
+
     def get_object(self):
         if self.action == "members":
             channel = super().get_object()
             return ChannelMember.objects.filter(channel_id=channel.id)
         else:
-            return super().get_object()
+            channel = super().get_object()
+            user = self.request.user
+
+            if not ChannelMember.objects.filter(channel_id=channel.id, member_id=user.id).exists():
+                raise PermissionDenied("You are not a member of this channel.")
+
+            return channel
 
     def create(self, request, *args, **kwargs):
         channel_members = request.data.get('channel_members', [])
@@ -123,10 +132,39 @@ class RoomChannelView(mixins.RetrieveModelMixin,
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
     @action(detail=True, methods=['delete'], url_path='members/(?P<member_id>[^/.]+)')
     def remove_channel_member(self, request, pk, member_id):
         serializer = self.get_serializer(data={'channel_id': pk, 'member_id': member_id})
         serializer.is_valid(raise_exception=True)
-        serializer.delete()
-        return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
+
+        try:
+            user_submissions = ChannelSubmission.objects.filter(
+                member_id=member_id,
+                channel_id=pk
+            )
+
+            submission_ids = user_submissions.values_list('id', flat=True)
+
+            user_submissions.delete()
+
+            # Delete voting marks received by the user's submissions
+            SubmissionVotingMark.objects.filter(submission_id__in=submission_ids).delete()
+
+            # Delete voting marks made by the user in the channel
+            SubmissionVotingMark.objects.filter(
+                member_id=member_id,
+                submission_id__channel_id=pk
+            ).delete()
+
+            ChannelMember.objects.filter(channel_id=pk, member_id=member_id).delete()
+
+            return Response(
+                {"message": "Member removed from channel and all associated data"},
+                status=status.HTTP_200_OK
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to remove member: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
