@@ -152,6 +152,7 @@ class RoomView(mixins.ListModelMixin,
                 member_id=member_id,
                 submission_id__channel_id__in=channel_ids
             ).delete()
+            serializer.delete()
 
             return Response(
                 {"message": "Member removed from room and all associated data"},
