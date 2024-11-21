@@ -5,11 +5,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from api.Model.ChannelMember import ChannelMember
+from api.Model.ChannelSubmission import ChannelSubmission
 from api.Model.CustomUser import CustomUser
 from api.Model.Room import Room
 from api.Model.RoomChannel import RoomChannel
 from api.Model.RoomMember import RoomMember
 from api.Model.RoomRequestJoin import RoomRequestJoin
+from api.Model.SubmissionVoting import SubmissionVotingMark
 from api.Serializer.RoomChannelSerializer import RoomChannelSerializer
 from api.Serializer.RoomMemberSerializer import RoomMemberSerializer, RoomMemberDeletionSerializer
 from api.Serializer.RoomRequestJoinSerializer import RoomRequestJoinSerializer
@@ -132,18 +134,27 @@ class RoomView(mixins.ListModelMixin,
 
         try:
             room_channels = RoomChannel.objects.filter(room_id=pk)
+            channel_ids = room_channels.values_list('id', flat=True)
 
-            ChannelMember.objects.filter(
-                channel_id__in=room_channels,
-                member_id=member_id
-            ).delete()
-
+            ChannelMember.objects.filter(channel_id__in=channel_ids, member_id=member_id).delete()
             RoomRequestJoin.objects.filter(room_id=pk, user_id=member_id).update(status='removed')
 
-            serializer.delete()
+            member_submissions = ChannelSubmission.objects.filter(
+                member_id=member_id,
+                channel_id__in=channel_ids
+            )
+
+            submission_ids = member_submissions.values_list('id', flat=True)
+            member_submissions.delete()
+
+            SubmissionVotingMark.objects.filter(submission_id__in=submission_ids).delete()
+            SubmissionVotingMark.objects.filter(
+                member_id=member_id,
+                submission_id__channel_id__in=channel_ids
+            ).delete()
 
             return Response(
-                {"message": "Member removed from room and all associated channels"},
+                {"message": "Member removed from room and all associated data"},
                 status=status.HTTP_200_OK
             )
 
@@ -152,6 +163,7 @@ class RoomView(mixins.ListModelMixin,
                 {"error": f"Failed to remove member: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
 
     @action(detail=False, methods=['post'])
     def join(self, request):
