@@ -168,3 +168,14 @@ class RoomChannelView(mixins.RetrieveModelMixin,
                 {"error": f"Failed to remove member: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    @action(detail=True, methods=['get'], url_path='is-member/(?P<member_id>[^/.]+)')
+    def is_user_member(self, request, pk, member_id):
+        try:
+            is_member = ChannelMember.objects.filter(channel_id=pk, member_id=member_id).exists()
+            return Response({"is_member": is_member}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to check membership: {str(e)}"},
+                status=status.HTTP_404_NOT_FOUND
+            )
