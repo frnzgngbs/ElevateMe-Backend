@@ -131,6 +131,43 @@ class GPTApiView(viewsets.GenericViewSet):
             return Response({"response": filtered_response}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['post'])
+    def new_five_whys(self, request):
+        list_of_whys = request.data.get('five_whys')
+        print(list_of_whys)
+        index = request.data.get('start_index_to_be_modify')
+
+        joined_whys = ", ".join(list_of_whys)
+
+        print(joined_whys)
+
+        prompt = (
+            f"Given this five whys {joined_whys}, I want you to modify the whys starting from the {index + 1} why until the last why, and make sure that you "
+            f"dont modify the other whys that is not from the range of the starting index. Directly give the five whys with no explanation."
+        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system",
+                 "content": SYSTEM_PROMPTS.get('new_five_whys')},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        print(response.choices[0].message.content)
+
+
+        five_whys = response.choices[0].message.content.split('\n')
+        filtered_response = []
+        for i in five_whys:
+            filtered_response.append(i[2:].strip())
+
+        return Response({"five_whys": filtered_response}, status=status.HTTP_200_OK)
+
+
+
+
     @action(detail=False, methods=['post'], name="Potential Root Problem")
     def potential_root(self, request):
         whys_dict = {"list_of_whys": request.data.get('list_of_whys')}
@@ -286,11 +323,20 @@ SYSTEM_PROMPTS = {
 
     'five_whys': """
         You are a problem statement analyzer. Your responses must:
-        1. Generate exactly 5 'why' questions
-        2. Each question must directly follow from the previous one
+        1. Generate exactly 5 'whys' questions
+        2. Each question should be a follow up or an answer but in a question manner 
         3. Questions must dig deeper into the root cause
         4. Format as '1. Why ...?', '2. Why ...?', etc.
         5. No more explanations just the root cause directy.
+    """,
+
+    'new_five_whys': """
+        You are a problem statement analyzer. Your responses must:
+        1. Generate exactly 5 'whys' questions
+        2. Each question should be a follow up or an answer but in a question manner 
+        3. Questions must dig deeper into the root cause
+        4. Format as '1. Why ...?', '2. Why ...?', etc.
+        5. Important detail to note, do not modify the other whys that is not from the range of the start index to last index.
     """,
 
     'potential_root': """
