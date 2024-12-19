@@ -1,4 +1,16 @@
 # BASE PATH: localhost:8000/api/
+# DEPLOYED PATH: https://babyjoy456.pythonanywhere.com/
+# ADMIN PATH: https://babyjoy456.pythonanywhere.com/admin/
+# ADMIN ACCOUNT:
+- USERNAME: eradehanjake@gmail.com
+- PASSWORD: 123
+
+# STACKS USED:
+- Django Framework
+- `pip install -r requirements.txt ` To automatically install the libraries and modules.
+
+# `py manage.py runserver` To run the server locally.
+## YOU SHOULD RUN THIS ALONGSIDE THE FRONTEND PROJECT `https://github.com/frnzgngbs/ElevateMe-FrontEnd`
 
 ### Endpoints for User.
 - GET `/user/` - This endpoint allows creating and querying a user.
