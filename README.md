@@ -1,4 +1,9 @@
 # BASE PATH: localhost:8000/api/
+# DEPLOYED PATH: https://babyjoy456.pythonanywhere.com/
+# ADMIN PATH: https://babyjoy456.pythonanywhere.com/admin/
+# ADMIN ACCOUNT:
+- USERNAME: eradehanjake@gmail.com
+- PASSWORD: 123
 
 ### Endpoints for User.
 - GET `/user/` - This endpoint allows creating and querying a user.
